@@ -1,0 +1,5 @@
+newmtl SM_Prop_GrassSG
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.000000 0.000000 0.000000
+map_Kd SM_Prop_Grass_1001_BaseColor.png
