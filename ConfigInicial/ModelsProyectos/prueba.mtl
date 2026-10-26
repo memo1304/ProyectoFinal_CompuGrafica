@@ -1,4 +1,4 @@
-# Blender 5.2.3 LTS MTL File: 'None'
+# Blender 5.2.2 LTS MTL File: 'proyecto.blend'
 # www.blender.org
 
 newmtl Mantel
@@ -1311,6 +1311,16 @@ d 1.000000
 illum 2
 map_Kd textura-pan.png
 
+newmtl base-puerta
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd textura-pared-desgastada.png
+
 newmtl cemento
 Ns 250.000000
 Ka 1.000000 1.000000 1.000000
@@ -1411,6 +1421,16 @@ d 1.000000
 illum 2
 map_Kd textura-cruz.png
 
+newmtl cruz.005
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd textura-cruz.png
+
 newmtl escalon
 Ns 250.000000
 Ka 1.000000 1.000000 1.000000
@@ -1430,6 +1450,16 @@ Ni 1.500000
 d 1.000000
 illum 2
 map_Kd textura-base-tumba.png
+
+newmtl flama
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd textura-vela-flama.png
 
 newmtl foto
 Ns 250.000000
@@ -2143,3 +2173,13 @@ d 1.000000
 illum 2
 map_Kd textura-tumba-flor.png
 map_Bump -bm 4.000000 textura-cruz-f.png
+
+newmtl vela-base
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd textura-vela.png
