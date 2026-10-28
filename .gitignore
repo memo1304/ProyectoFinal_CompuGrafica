@@ -16,21 +16,21 @@
 # Mono auto generated files
 mono_crash.*
 
-# Build results
-[Dd]ebug/
-[Dd]ebugPublic/
-[Rr]elease/
-[Rr]eleases/
-x64/
-x86/
-[Ww][Ii][Nn]32/
-[Aa][Rr][Mm]/
-[Aa][Rr][Mm]64/
-bld/
-[Bb]in/
-[Oo]bj/
-[Ll]og/
-[Ll]ogs/
+# Build results (AQUI ESTA LA CORRECCION CON LAS BARRAS /)
+/[Dd]ebug/
+/[Dd]ebugPublic/
+/[Rr]elease/
+/[Rr]eleases/
+/x64/
+/x86/
+/[Ww][Ii][Nn]32/
+/[Aa][Rr][Mm]/
+/[Aa][Rr][Mm]64/
+/bld/
+/[Bb]in/
+/[Oo]bj/
+/[Ll]og/
+/[Ll]ogs/
 
 # Visual Studio 2015/2017 cache/options directory
 .vs/
@@ -136,14 +136,14 @@ _ReSharper*/
 # TeamCity is a build add-in
 _TeamCity*
 
-# DotCover is a Code Coverage Tool
+# DotCover is a code coverage Tool
 *.dotCover
 
 # AxoCover is a Code Coverage Tool
 .axoCover/*
 !.axoCover/settings.json
 
-# Coverlet is a free, cross platform Code Coverage Tool
+# Coverlet is a cross platform Code Coverage Tool
 coverage*.json
 coverage*.xml
 coverage*.info
