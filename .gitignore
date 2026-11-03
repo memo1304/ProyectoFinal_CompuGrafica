@@ -398,3 +398,10 @@ FodyWeavers.xsd
 
 # JetBrains Rider
 *.sln.iml
+
+# Archivos temporales de Visual Studio
+Debug/
+x64/
+*.obj
+*.idb
+*.recipe
