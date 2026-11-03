@@ -1,6 +1,8 @@
 #version 330 core
 
-#define NUMBER_OF_POINT_LIGHTS 8
+#define NUM_FLAMES   73      // debe ser igual a totalFlamas en main.cpp
+#define NUM_NEAREST  8       // cuantas velas iluminan cada punto (igual que antes)
+#define FLAME_INTENSITY 0.65 // intensidad de TODAS las velas: 1.0 = como antes, menor = mas tenue
 
 struct Material {
     sampler2D diffuse;
@@ -10,12 +12,6 @@ struct Material {
 
 struct DirLight {
     vec3 direction;
-    vec3 ambient, diffuse, specular;
-};
-
-struct PointLight {
-    vec3 position;
-    float constant, linear, quadratic;
     vec3 ambient, diffuse, specular;
 };
 
@@ -33,21 +29,24 @@ out vec4 color;
 
 uniform vec3      viewPos;
 uniform DirLight  dirLight;
-uniform PointLight pointLights[NUMBER_OF_POINT_LIGHTS];
 uniform SpotLight spotLight;
 uniform Material  material;
 uniform int       transparency;
-uniform vec3      emissive; 
+uniform vec3      emissive;
+
+// ★ NUEVO: posicion de cada vela y tiempo (para el parpadeo)
+uniform vec3  flamePos[NUM_FLAMES];
+uniform float uTime;
 
 vec3 CalcDirLight  (DirLight  L, vec3 N, vec3 V);
-vec3 CalcPointLight(PointLight L, vec3 N, vec3 P, vec3 V);
 vec3 CalcSpotLight (SpotLight  L, vec3 N, vec3 P, vec3 V);
+vec3 CalcAllFlames (vec3 N, vec3 P, vec3 V);   // ★ NUEVO
 
 // Helper: sample albedo con fallback si la textura está vacía/negra
 vec3 sampleAlbedo()
 {
     vec3 a = texture(material.diffuse, TexCoords).rgb;
-    return max(a, vec3(0.12));   // <-- SALVAVIDAS: nunca negro absoluto
+    return max(a, vec3(0.12));   // nunca negro absoluto
 }
 
 void main()
@@ -57,12 +56,12 @@ void main()
 
     vec3 result = CalcDirLight(dirLight, N, V);
 
-    for (int i = 0; i < NUMBER_OF_POINT_LIGHTS; i++)
-        result += CalcPointLight(pointLights[i], N, FragPos, V);
+    // ★ CAMBIO: antes aqui habia un for con las 8 pointLights
+    result += CalcAllFlames(N, FragPos, V);
 
     result += CalcSpotLight(spotLight, N, FragPos, V);
 
-    // ── NUEVO: brillo propio (emissive) ──
+    // brillo propio (emissive)
     vec3 albedo = texture(material.diffuse, TexCoords).rgb;
     result = max(result, emissive * albedo);   // la luna se ilumina a sí misma
 
@@ -84,20 +83,63 @@ vec3 CalcDirLight(DirLight L, vec3 N, vec3 V)
          + (L.specular * s * vec3(texture(material.specular, TexCoords)));
 }
 
-vec3 CalcPointLight(PointLight L, vec3 N, vec3 P, vec3 V)
+// ★ NUEVO: para cada fragmento se buscan sus 8 velas mas cercanas y se suma su luz.
+//   Mismos colores, atenuacion y parpadeo que las luces puntuales anteriores.
+vec3 CalcAllFlames(vec3 N, vec3 P, vec3 V)
 {
-    vec3 Ld   = normalize(L.position - P);
-    float d   = max(dot(N, Ld), 0.0);
-    vec3 R    = reflect(-Ld, N);
-    float s   = pow(max(dot(V, R), 0.0), material.shininess);
+    // 1) Buscar las NUM_NEAREST velas mas cercanas a este punto (lista ordenada por distancia)
+    float bestD2[NUM_NEAREST];
+    int   bestI [NUM_NEAREST];
+    for (int k = 0; k < NUM_NEAREST; k++) { bestD2[k] = 1e20; bestI[k] = 0; }
 
-    float dist = length(L.position - P);
-    float att  = 1.0 / (L.constant + L.linear * dist + L.quadratic * dist * dist);
+    for (int i = 0; i < NUM_FLAMES; i++)
+    {
+        vec3  dv = (flamePos[i] + vec3(0.0, 0.08, 0.0)) - P;
+        float d2 = dot(dv, dv);
+        if (d2 < bestD2[NUM_NEAREST - 1])
+        {
+            int j = NUM_NEAREST - 1;
+            while (j > 0 && bestD2[j - 1] > d2)
+            {
+                bestD2[j] = bestD2[j - 1];
+                bestI [j] = bestI [j - 1];
+                j--;
+            }
+            bestD2[j] = d2;
+            bestI [j] = i;
+        }
+    }
 
-    vec3 albedo = sampleAlbedo();
-    return att * ( (L.ambient * albedo)
-                 + (L.diffuse * d * albedo)
-                 + (L.specular * s * vec3(texture(material.specular, TexCoords))) );
+    // 2) Sumar la luz de esas velas
+    vec3 albedo  = sampleAlbedo();                                // se lee una sola vez
+    vec3 specTex = vec3(texture(material.specular, TexCoords));   // se lee una sola vez
+    vec3 total   = vec3(0.0);
+
+    for (int k = 0; k < NUM_NEAREST; k++)
+    {
+        int   idx  = bestI[k];
+        vec3  toL  = (flamePos[idx] + vec3(0.0, 0.08, 0.0)) - P;
+        float dist = max(length(toL), 0.0001);
+
+        float seed    = uTime + float(idx) * 0.35;
+        float flicker = 0.85 + 0.10 * sin(seed * 5.1) + 0.05 * sin(seed * 12.3);
+
+        vec3  Ld = toL / dist;
+        float d  = max(dot(N, Ld), 0.0);
+        vec3  R  = reflect(-Ld, N);
+        float s  = pow(max(dot(V, R), 0.0), material.shininess);
+
+        float att = 1.0 / (1.0 + 0.20 * dist + 0.18 * dist * dist);
+
+        vec3 amb = vec3(0.20, 0.06, 0.00) * flicker;
+        vec3 dif = vec3(1.20, 0.55, 0.15) * flicker;
+        vec3 spc = vec3(1.00, 0.60, 0.20) * flicker;
+
+        total += att * ( (amb * albedo)
+                       + (dif * d * albedo)
+                       + (spc * s * specTex) );
+    }
+    return total * FLAME_INTENSITY;
 }
 
 vec3 CalcSpotLight(SpotLight L, vec3 N, vec3 P, vec3 V)

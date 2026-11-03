@@ -130,6 +130,13 @@ public:
 		return this->front;
 	}
 
+	// NUEVA FUNCIÓN AGREGADA AQUÍ
+	void SetYaw(GLfloat newYaw)
+	{
+		this->yaw = newYaw;
+		this->updateCameraVectors();
+	}
+
 private:
 	// Camera Attributes
 	glm::vec3 position;
