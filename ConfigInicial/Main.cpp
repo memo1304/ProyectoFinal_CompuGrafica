@@ -44,7 +44,7 @@ void playSound(const std::string& filename) {
 }
 
 // ───────────── Configuración ─────────────
-const GLuint WIDTH = 800, HEIGHT = 600;
+const GLuint WIDTH = 1600, HEIGHT = 900;
 int SCREEN_WIDTH, SCREEN_HEIGHT;
 
 Camera  camera(glm::vec3(-2.014f, 1.199f, -1.36796f)); 
