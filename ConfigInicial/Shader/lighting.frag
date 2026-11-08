@@ -1,6 +1,6 @@
 #version 330 core
 
-#define NUM_FLAMES   73      // debe ser igual a totalFlamas en main.cpp
+#define NUM_FLAMES   169      // debe ser igual a totalFlamas en main.cpp
 #define NUM_NEAREST  8       // cuantas velas iluminan cada punto (igual que antes)
 #define FLAME_INTENSITY 0.65 // intensidad de TODAS las velas: 1.0 = como antes, menor = mas tenue
 

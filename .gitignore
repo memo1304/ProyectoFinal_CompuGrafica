@@ -402,6 +402,6 @@ FodyWeavers.xsd
 # Archivos temporales de Visual Studio
 Debug/
 x64/
-*.obj
 *.idb
-*.recipe
+*.recipe.DS_Store
+**/.DS_Store

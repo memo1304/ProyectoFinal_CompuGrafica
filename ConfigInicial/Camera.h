@@ -94,14 +94,14 @@ public:
 		// Make sure that when pitch is out of bounds, screen doesn't get flipped
 		if (constrainPitch)
 		{
-			if (this->pitch > 89.0f)
+			if (this->pitch > this->maxPitch)
 			{
-				this->pitch = 89.0f;
+				this->pitch = this->maxPitch;
 			}
 
-			if (this->pitch < -89.0f)
+			if (this->pitch < this->minPitch)
 			{
-				this->pitch = -89.0f;
+				this->pitch = this->minPitch;
 			}
 		}
 
@@ -137,6 +137,29 @@ public:
 		this->updateCameraVectors();
 	}
 
+	// ── Agregado para la camara estilo GTA ──
+	GLfloat GetYaw()   { return this->yaw; }
+	GLfloat GetPitch() { return this->pitch; }
+
+	// Cambia el pitch respetando los limites actuales
+	void SetPitch(GLfloat newPitch)
+	{
+		if (newPitch > this->maxPitch) newPitch = this->maxPitch;
+		if (newPitch < this->minPitch) newPitch = this->minPitch;
+		this->pitch = newPitch;
+		this->updateCameraVectors();
+	}
+
+	// Limites de inclinacion de la camara (por defecto -89 a 89)
+	void SetPitchLimits(GLfloat minP, GLfloat maxP)
+	{
+		this->minPitch = minP;
+		this->maxPitch = maxP;
+		if (this->pitch > maxP) this->pitch = maxP;
+		if (this->pitch < minP) this->pitch = minP;
+		this->updateCameraVectors();
+	}
+
 private:
 	// Camera Attributes
 	glm::vec3 position;
@@ -153,6 +176,10 @@ private:
 	GLfloat movementSpeed;
 	GLfloat mouseSensitivity;
 	GLfloat zoom;
+
+	// Limites de pitch (agregado)
+	GLfloat minPitch = -89.0f;
+	GLfloat maxPitch =  89.0f;
 
 	// Calculates the front vector from the Camera's (updated) Eular Angles
 	void updateCameraVectors()

@@ -4,6 +4,7 @@
 #include <string>
 #include <sstream>
 #include <algorithm>
+#include <iterator>
 #include <cstdlib>
 #include <thread>
 
@@ -22,6 +23,8 @@
 #include "Model.h"
 
 #include "DanzaPescadores.h"
+#include "Mariposas.h"
+#include "Personaje.h"
 
 // ───────────── Callbacks ─────────────
 void KeyCallback(GLFWwindow*, int, int, int, int);
@@ -60,7 +63,9 @@ GLfloat lastFrame = 0.0f;
 // ═══════════════════════════════════════════════════════════
 // SISTEMA DE CÁMARAS Y SUELO
 // ═══════════════════════════════════════════════════════════
-enum CameraMode { FIRST_PERSON, THIRD_PERSON_RESTRICTED, THIRD_PERSON_FREE };
+// La tecla C las recorre en este orden.
+enum CameraMode { FIRST_PERSON, THIRD_PERSON_GTA, THIRD_PERSON_RESTRICTED, THIRD_PERSON_FREE };
+const int TOTAL_CAMERA_MODES = 4;
 CameraMode currentCameraMode = FIRST_PERSON;
 
 // Posición inicial EXACTA en las puertas
@@ -70,6 +75,23 @@ glm::vec3 playerPos = glm::vec3(-2.63651f, 0.699024f, -1.4178f);
 const float eyeHeight = 0.5f; 
 
 const glm::vec3 STAIRS_START = glm::vec3(-2.63651f, 0.699024f, -1.4178f);
+
+// ── Camara estilo GTA ──
+const float GTA_DISTANCIA       = 1.10f;   // que tan atras queda la camara del personaje
+const float GTA_DISTANCIA_MIN   = 0.30f;   // no se acerca mas que esto (por las paredes)
+const float GTA_ALTURA_OBJETIVO = 0.28f;   // punto al que mira (altura sobre los pies, ~pecho)
+const float GTA_PITCH_MIN       = -50.0f;  // mirar hacia abajo (camara alta)
+const float GTA_PITCH_MAX       =  15.0f;  // mirar hacia arriba (camara baja)
+const float GTA_PITCH_INICIAL   = -15.0f;
+const float PERSONAJE_RADIO     = 0.08f;   // "grosor" del personaje para chocar con paredes
+
+// ── Ambiente nocturno ──
+// 1.0 = como estaba antes; mas bajo = mas oscuro. Ninguna de estas afecta la luz de las flamas.
+const float LUZ_ESCENARIO = 0.45f;   // luz de luna sobre el escenario (direccional + reflector)
+const float BRILLO_CIELO  = 0.55f;   // brillo del cielo (cielo.obj)
+const float LUZ_PISO      = 1.00f;   // resplandor calido fijo del piso (subelo/bajalo si el piso se ve claro)
+
+Personaje::Estado personaje;
 
 // ── FUNCIÓN DEL SUELO ──
 float getFloorHeight(float x, float z) {
@@ -143,7 +165,7 @@ static glm::vec2 closestPointOnSegment(const glm::vec2& p, const glm::vec2& a, c
 }
 
 // Saca al jugador de las paredes; al empujar en diagonal se desliza a lo largo de la pared
-static void resolveWallCollisions(glm::vec3& pos)
+static void resolveWallCollisions(glm::vec3& pos, float radius = PLAYER_RADIUS)
 {
     glm::vec2 p(pos.x, pos.z);
     for (int iter = 0; iter < 3; ++iter) {
@@ -151,19 +173,48 @@ static void resolveWallCollisions(glm::vec3& pos)
             glm::vec2 c = closestPointOnSegment(p, w.a, w.b);
             glm::vec2 d = p - c;
             float dist = glm::length(d);
-            if (dist < PLAYER_RADIUS) {
+            if (dist < radius) {
                 if (dist > 1e-5f) {
-                    p = c + d / dist * PLAYER_RADIUS;
+                    p = c + d / dist * radius;
                 } else {
                     glm::vec2 e = w.b - w.a;
                     glm::vec2 n = glm::normalize(glm::vec2(-e.y, e.x));
-                    p = c + n * PLAYER_RADIUS;
+                    p = c + n * radius;
                 }
             }
         }
     }
     pos.x = p.x;
     pos.z = p.y;
+}
+
+// ── Posicion de la camara GTA: detras del personaje, sin atravesar paredes ni suelo ──
+static glm::vec3 posicionCamaraGTA(const glm::vec3& target, const glm::vec3& front)
+{
+    glm::vec3 dir = -front;                         // del personaje hacia la camara
+    glm::vec2 o(target.x, target.z);
+    glm::vec2 d(dir.x * GTA_DISTANCIA, dir.z * GTA_DISTANCIA);
+
+    // Si una pared queda entre el personaje y la camara, la camara se acerca
+    float tMin = 1.0f;
+    for (const Pared& w : PAREDES) {
+        glm::vec2 e  = w.b - w.a;
+        glm::vec2 ao = w.a - o;
+        float den = d.x * e.y - d.y * e.x;
+        if (std::fabs(den) < 1e-8f) continue;
+        float t = (ao.x * e.y - ao.y * e.x) / den;
+        float u = (ao.x * d.y - ao.y * d.x) / den;
+        if (t > 0.0f && t < tMin && u >= 0.0f && u <= 1.0f) tMin = t;
+    }
+    float dist = GTA_DISTANCIA;
+    if (tMin < 1.0f) dist = std::max(GTA_DISTANCIA_MIN, tMin * GTA_DISTANCIA - 0.06f);
+
+    glm::vec3 pos = target + dir * dist;
+
+    // Nunca debajo del piso
+    float minY = getFloorHeight(pos.x, pos.z) + 0.06f;
+    if (pos.y < minY) pos.y = minY;
+    return pos;
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -263,9 +314,227 @@ const PescadorPose PESCADORES[3] = {
 const int TOTAL_PESCADORES = 3;
 
 // ═══════════════════════════════════════════════════════════
-// FLAMAS
+// VELADORAS (3 tipos, cada una con su modelo)
+// Posicion de cada veladora; el modelo se dibuja con su origen en ese punto.
 // ═══════════════════════════════════════════════════════════
-glm::vec3 posicionesFlamas[] = {
+// Opacidad de las veladoras: 1.0 = solidas, 0.0 = invisibles. Prueba entre 0.4 y 0.8.
+const float VELADORA_OPACIDAD = 0.55f;
+
+const glm::vec3 VELADORAS_AZULES[] = {
+    glm::vec3(3.8508f, 0.0447f, 1.2191f),
+    glm::vec3(4.0498f, 0.0447f, 1.2191f),
+    glm::vec3(1.2253f, 0.1644f, -0.2572f),
+    glm::vec3(2.0575f, 0.0476f, 0.4577f),
+    glm::vec3(1.2253f, 0.1644f, -0.5958f),
+    glm::vec3(1.0680f, 0.0772f, -0.5958f),
+    glm::vec3(1.0680f, 0.0772f, -0.2602f),
+    glm::vec3(0.8767f, 0.0772f, -0.2602f),
+    glm::vec3(0.8767f, 0.0772f, -0.5853f),
+    glm::vec3(1.9333f, 0.0476f, 0.4577f),
+    glm::vec3(3.8508f, 0.0447f, 0.8833f),
+    glm::vec3(4.0498f, 0.0447f, 0.8833f),
+    glm::vec3(2.0575f, 0.0720f, 0.8924f),
+    glm::vec3(1.9333f, 0.0720f, 0.8924f)
+};
+
+const glm::vec3 VELADORAS_ROJAS[] = {          // veladora-roja.obj
+    glm::vec3(-0.0962f, 0.1513f, 0.6829f),
+    glm::vec3(0.2375f, 0.0655f, 0.9972f),
+    glm::vec3(0.0569f, 0.0655f, 0.6723f),
+    glm::vec3(0.0569f, 0.0655f, 0.9986f),
+    glm::vec3(0.3328f, -0.0131f, 1.0077f),
+    glm::vec3(0.4179f, -0.0131f, 1.0077f),
+    glm::vec3(0.5069f, -0.0131f, 1.0077f),
+    glm::vec3(0.5858f, -0.0131f, 1.0077f),
+    glm::vec3(0.6710f, -0.0131f, 1.0077f),
+    glm::vec3(0.7599f, -0.0131f, 1.0077f),
+    glm::vec3(0.3328f, -0.0131f, 0.6536f),
+    glm::vec3(0.4179f, -0.0131f, 0.6536f),
+    glm::vec3(0.5069f, -0.0131f, 0.6536f),
+    glm::vec3(0.5858f, -0.0131f, 0.6536f),
+    glm::vec3(0.6710f, -0.0131f, 0.6536f),
+    glm::vec3(0.7599f, -0.0131f, 0.6536f),
+    glm::vec3(0.8858f, -0.0131f, 0.9682f),
+    glm::vec3(0.8858f, -0.0131f, 0.8393f),
+    glm::vec3(0.8858f, -0.0131f, 0.7091f),
+    glm::vec3(0.2375f, 0.0655f, 0.6723f),
+    glm::vec3(-0.0962f, 0.1513f, 0.9972f)
+};
+
+const glm::vec3 VELADORAS2_ROJAS[] = {         // veladora2-roja.obj
+    glm::vec3(3.9173f, 0.0211f, -1.3924f),
+    glm::vec3(3.8521f, 0.0211f, -1.3924f),
+    glm::vec3(3.7830f, 0.0211f, -1.3924f),
+    glm::vec3(3.7268f, 0.0211f, -1.3924f),
+    glm::vec3(3.8521f, 0.0211f, -1.4525f),
+    glm::vec3(3.8521f, 0.0211f, -1.3360f),
+    glm::vec3(2.5280f, 0.0070f, -1.2567f),
+    glm::vec3(2.6131f, 0.0070f, -1.2567f),
+    glm::vec3(2.7021f, 0.0070f, -1.2567f),
+    glm::vec3(2.7898f, 0.0070f, -1.2567f),
+    glm::vec3(2.8749f, 0.0070f, -1.2567f),
+    glm::vec3(2.9639f, 0.0070f, -1.2567f),
+    glm::vec3(3.0937f, 0.0070f, -1.2567f),
+    glm::vec3(3.2078f, 0.0070f, -1.3095f),
+    glm::vec3(3.2259f, 0.0070f, -1.4630f),
+    glm::vec3(3.2259f, 0.0070f, -1.5599f),
+    glm::vec3(3.2259f, 0.0070f, -1.6742f),
+    glm::vec3(3.2259f, 0.0070f, -1.7625f),
+    glm::vec3(2.8478f, 0.0619f, -1.5610f),
+    glm::vec3(2.9129f, 0.0619f, -1.5610f),
+    glm::vec3(2.9821f, 0.0619f, -1.5610f),
+    glm::vec3(3.0382f, 0.0471f, -1.5610f),
+    glm::vec3(2.9129f, 0.0619f, -1.5008f),
+    glm::vec3(2.9129f, 0.0619f, -1.6174f)
+};
+
+const glm::vec3 VELADORAS_AMARILLAS[] = {
+    glm::vec3(2.2622f, -0.0068f, -0.2605f),
+    glm::vec3(2.3925f, -0.0068f, -0.2605f),
+    glm::vec3(2.5239f, -0.0068f, -0.2605f),
+    glm::vec3(2.6840f, -0.0068f, -0.2605f),
+    glm::vec3(2.7445f, -0.0068f, -0.3216f),
+    glm::vec3(2.7445f, -0.0068f, -0.4533f),
+    glm::vec3(2.7445f, -0.0068f, -0.5814f),
+    glm::vec3(2.2622f, -0.0068f, -0.6618f),
+    glm::vec3(2.3925f, -0.0068f, -0.6618f),
+    glm::vec3(2.5239f, -0.0068f, -0.6618f),
+    glm::vec3(2.6840f, -0.0068f, -0.6618f),
+    glm::vec3(3.7965f, -0.0068f, -0.4637f),
+    glm::vec3(3.9232f, -0.0068f, -0.4637f),
+    glm::vec3(4.0778f, -0.0068f, -0.4637f),
+    glm::vec3(4.2045f, -0.0068f, -0.4637f),
+    glm::vec3(4.0778f, -0.0068f, 0.1149f),
+    glm::vec3(4.2045f, -0.0068f, 0.1149f),
+    glm::vec3(3.7968f, -0.0068f, 0.1149f),
+    glm::vec3(3.9235f, -0.0068f, 0.1149f),
+    glm::vec3(3.2156f, 0.0077f, 1.2081f),
+    glm::vec3(3.2650f, 0.0077f, 1.2081f),
+    glm::vec3(3.3165f, 0.0077f, 1.2081f),
+    glm::vec3(3.3599f, 0.0077f, 1.2081f),
+    glm::vec3(3.2650f, 0.0077f, 1.1526f),
+    glm::vec3(3.2650f, 0.0077f, 1.2632f),
+    glm::vec3(2.2622f, 0.0119f, -0.6618f),
+    glm::vec3(0.9310f, -0.0020f, -1.4412f),
+    glm::vec3(0.9310f, -0.0020f, -1.4884f),
+    glm::vec3(0.9310f, -0.0020f, -1.5369f),
+    glm::vec3(0.9310f, -0.0020f, -1.5825f),
+    glm::vec3(0.9310f, -0.0020f, -1.3912f),
+    glm::vec3(0.8855f, -0.0020f, -1.3912f),
+    glm::vec3(0.8377f, -0.0020f, -1.3912f),
+    glm::vec3(0.8347f, -0.0020f, -1.4412f),
+    glm::vec3(0.8347f, -0.0020f, -1.4884f),
+    glm::vec3(0.8347f, -0.0020f, -1.5369f),
+    glm::vec3(0.8347f, -0.0020f, -1.5825f),
+    glm::vec3(0.8855f, -0.0020f, -1.5843f)
+};
+
+// ═══════════════════════════════════════════════════════════
+// FLAMAS
+//   FLAMAS_ANTERIORES: las 73 flamas que ya tenias (no se quita ninguna).
+//   FLAMAS_NUEVAS:     una por cada veladora nueva (96).
+//   Las dos listas se juntan en una sola al iniciar (73 + 96 = 169 flamas).
+// ═══════════════════════════════════════════════════════════
+const glm::vec3 FLAMAS_NUEVAS[] = {
+    glm::vec3(-0.0961f, 0.1930f, 0.6831f),
+    glm::vec3(-0.0961f, 0.1930f, 0.9971f),
+    glm::vec3(0.0567f, 0.1072f, 0.9971f),
+    glm::vec3(0.2375f, 0.1077f, 0.9971f),
+    glm::vec3(0.2375f, 0.1077f, 0.6717f),
+    glm::vec3(0.0567f, 0.1077f, 0.6717f),
+    glm::vec3(0.3327f, 0.0291f, 1.0076f),
+    glm::vec3(0.4178f, 0.0291f, 1.0076f),
+    glm::vec3(0.5068f, 0.0291f, 1.0076f),
+    glm::vec3(0.5858f, 0.0291f, 1.0076f),
+    glm::vec3(0.6709f, 0.0291f, 1.0076f),
+    glm::vec3(0.7599f, 0.0291f, 1.0076f),
+    glm::vec3(0.3327f, 0.0291f, 0.6536f),
+    glm::vec3(0.4178f, 0.0291f, 0.6536f),
+    glm::vec3(0.5068f, 0.0291f, 0.6536f),
+    glm::vec3(0.5858f, 0.0291f, 0.6536f),
+    glm::vec3(0.6709f, 0.0291f, 0.6536f),
+    glm::vec3(0.7599f, 0.0291f, 0.6536f),
+    glm::vec3(0.8858f, 0.0291f, 0.9682f),
+    glm::vec3(0.8858f, 0.0291f, 0.8392f),
+    glm::vec3(0.8858f, 0.0291f, 0.7091f),
+    glm::vec3(3.8509f, 0.1141f, 1.2192f),
+    glm::vec3(4.0503f, 0.1141f, 1.2192f),
+    glm::vec3(1.2254f, 0.2338f, -0.2571f),
+    glm::vec3(2.0580f, 0.1170f, 0.4577f),
+    glm::vec3(2.2623f, 0.0626f, -0.2605f),
+    glm::vec3(2.3926f, 0.0626f, -0.2605f),
+    glm::vec3(2.5241f, 0.0626f, -0.2605f),
+    glm::vec3(2.6841f, 0.0626f, -0.2605f),
+    glm::vec3(2.7446f, 0.0626f, -0.3215f),
+    glm::vec3(2.7446f, 0.0626f, -0.4532f),
+    glm::vec3(2.7446f, 0.0626f, -0.5813f),
+    glm::vec3(2.2623f, 0.0626f, -0.6617f),
+    glm::vec3(2.3926f, 0.0626f, -0.6617f),
+    glm::vec3(2.5241f, 0.0626f, -0.6617f),
+    glm::vec3(2.6841f, 0.0626f, -0.6617f),
+    glm::vec3(3.9172f, 0.0432f, -1.3925f),
+    glm::vec3(3.8521f, 0.0432f, -1.3925f),
+    glm::vec3(3.7829f, 0.0432f, -1.3925f),
+    glm::vec3(3.7268f, 0.0432f, -1.3925f),
+    glm::vec3(3.8521f, 0.0432f, -1.4526f),
+    glm::vec3(3.8521f, 0.0432f, -1.3360f),
+    glm::vec3(1.2254f, 0.2338f, -0.5957f),
+    glm::vec3(1.0682f, 0.1466f, -0.5957f),
+    glm::vec3(1.0682f, 0.1466f, -0.2601f),
+    glm::vec3(0.8769f, 0.1466f, -0.2601f),
+    glm::vec3(0.8769f, 0.1466f, -0.5852f),
+    glm::vec3(1.9338f, 0.1170f, 0.4577f),
+    glm::vec3(3.7966f, 0.0626f, -0.4637f),
+    glm::vec3(3.9233f, 0.0626f, -0.4637f),
+    glm::vec3(4.0779f, 0.0626f, -0.4637f),
+    glm::vec3(4.2046f, 0.0626f, -0.4637f),
+    glm::vec3(4.0779f, 0.0626f, 0.1149f),
+    glm::vec3(4.2046f, 0.0626f, 0.1149f),
+    glm::vec3(3.7969f, 0.0626f, 0.1149f),
+    glm::vec3(3.9236f, 0.0626f, 0.1149f),
+    glm::vec3(2.5279f, 0.0291f, -1.2568f),
+    glm::vec3(2.6130f, 0.0291f, -1.2568f),
+    glm::vec3(2.7020f, 0.0291f, -1.2568f),
+    glm::vec3(2.7897f, 0.0291f, -1.2568f),
+    glm::vec3(2.8748f, 0.0291f, -1.2568f),
+    glm::vec3(2.9638f, 0.0291f, -1.2568f),
+    glm::vec3(3.0936f, 0.0291f, -1.2568f),
+    glm::vec3(3.2077f, 0.0291f, -1.3095f),
+    glm::vec3(3.2258f, 0.0291f, -1.4630f),
+    glm::vec3(3.2258f, 0.0291f, -1.5599f),
+    glm::vec3(3.2258f, 0.0291f, -1.6743f),
+    glm::vec3(3.2258f, 0.0291f, -1.7626f),
+    glm::vec3(2.8479f, 0.0840f, -1.5609f),
+    glm::vec3(2.9130f, 0.0840f, -1.5609f),
+    glm::vec3(2.9822f, 0.0840f, -1.5609f),
+    glm::vec3(3.0383f, 0.0692f, -1.5609f),
+    glm::vec3(2.9130f, 0.0840f, -1.5008f),
+    glm::vec3(2.9130f, 0.0840f, -1.6173f),
+    glm::vec3(3.8509f, 0.1141f, 0.8834f),
+    glm::vec3(4.0503f, 0.1141f, 0.8834f),
+    glm::vec3(2.0580f, 0.1414f, 0.8925f),
+    glm::vec3(1.9338f, 0.1414f, 0.8925f),
+    glm::vec3(3.2157f, 0.0771f, 1.2081f),
+    glm::vec3(3.2651f, 0.0771f, 1.2081f),
+    glm::vec3(3.3166f, 0.0771f, 1.2081f),
+    glm::vec3(3.3601f, 0.0771f, 1.2081f),
+    glm::vec3(3.2651f, 0.0771f, 1.2632f),
+    glm::vec3(3.2651f, 0.0771f, 1.1527f),
+    glm::vec3(0.8381f, 0.0660f, -1.3915f),
+    glm::vec3(0.8857f, 0.0662f, -1.3907f),
+    glm::vec3(0.9314f, 0.0662f, -1.3907f),
+    glm::vec3(0.8347f, 0.0660f, -1.4888f),
+    glm::vec3(0.9314f, 0.0662f, -1.4880f),
+    glm::vec3(0.8347f, 0.0660f, -1.5368f),
+    glm::vec3(0.9314f, 0.0662f, -1.5360f),
+    glm::vec3(0.8347f, 0.0660f, -1.5823f),
+    glm::vec3(0.9314f, 0.0662f, -1.5815f),
+    glm::vec3(0.8859f, 0.0662f, -1.5839f),
+    glm::vec3(0.8347f, 0.0660f, -1.4411f),
+    glm::vec3(0.9314f, 0.0662f, -1.4408f)
+};
+
+const glm::vec3 FLAMAS_ANTERIORES[] = {
     glm::vec3(0.000f, 0.224f, 0.554f), glm::vec3(0.463f, 0.224f, 0.554f), glm::vec3(0.823f, 0.224f, 0.554f),
     glm::vec3(0.836f, 0.224f, 1.057f), glm::vec3(0.463f, 0.224f, 1.058f), glm::vec3(0.027f, 0.224f, 1.067f),
     glm::vec3(1.702f, 0.224f, 0.423f), glm::vec3(1.702f, 0.224f, 0.704f), glm::vec3(1.702f, 0.224f, 0.959f),
@@ -292,7 +561,17 @@ glm::vec3 posicionesFlamas[] = {
     glm::vec3(3.656f, 0.224f, -1.136f), glm::vec3(4.192f, 0.224f, -1.653f), glm::vec3(3.912f, 0.224f, -1.653f),
     glm::vec3(3.656f, 0.224f, -1.653f)
 };
-int totalFlamas = sizeof(posicionesFlamas) / sizeof(glm::vec3);
+
+std::vector<glm::vec3> posicionesFlamas;
+int totalFlamas = 0;
+
+// Junta las flamas anteriores con las nuevas en una sola lista (la que usa el shader)
+static void construirFlamas()
+{
+    posicionesFlamas.assign(std::begin(FLAMAS_ANTERIORES), std::end(FLAMAS_ANTERIORES));
+    posicionesFlamas.insert(posicionesFlamas.end(), std::begin(FLAMAS_NUEVAS), std::end(FLAMAS_NUEVAS));
+    totalFlamas = (int)posicionesFlamas.size();
+}
 
 // ───────────── Helpers ─────────────
 static void setVec3 (GLuint p, const std::string& n, float x, float y, float z)
@@ -355,7 +634,8 @@ int main()
     Shader textShader("Shader/text.vs", "Shader/text.frag");
 
     // Modelos
-    Model escenario((char*)"ModelsProyectos/prueba.obj");
+    Model cielo    ((char*)"ModelsProyectos/cielo.obj");
+    Model escenario((char*)"ModelsProyectos/terreno.obj");
     Model flama    ((char*)"ModelsProyectos/flama.obj");
     Model luna     ((char*)"ModelsProyectos/Moon.obj");
     Model puerta1  ((char*)"ModelsProyectos/puerta1.obj");
@@ -374,9 +654,49 @@ int main()
     Model piernaDer  ((char*)"ModelsProyectos/pierna-derecha.obj");
     Model redPesc    ((char*)"ModelsProyectos/red.obj");
 
+    // Veladoras (3 tipos)
+    Model velAzul     ((char*)"ModelsProyectos/veladora-azul.obj");
+    Model velRoja     ((char*)"ModelsProyectos/veladora-roja.obj");
+    Model velRoja2    ((char*)"ModelsProyectos/veladora2-roja.obj");
+    Model velAmarilla ((char*)"ModelsProyectos/veladora-amarilla.obj");
+
+    // Mariposas (las 3 comparten los mismos 3 modelos)
+    Model mariposaCuerpo ((char*)"ModelsProyectos/cuerpo-mariposa.obj");
+    Model mariposaAlaDer ((char*)"ModelsProyectos/ala-derecha.obj");
+    Model mariposaAlaIzq ((char*)"ModelsProyectos/ala-izquierda.obj");
+
+    // Personaje (camara GTA)
+    Model pjTorso       ((char*)"ModelsProyectos/torso-ca.obj");
+    Model pjHombroDer   ((char*)"ModelsProyectos/hombro-derecho-ca.obj");
+    Model pjHombroIzq   ((char*)"ModelsProyectos/hombro-izquierdo-ca.obj");
+    Model pjCodoDer     ((char*)"ModelsProyectos/codo-derecho-ca.obj");
+    Model pjCodoIzq     ((char*)"ModelsProyectos/codo-izquierdo-ca.obj");
+    Model pjPiernaDer   ((char*)"ModelsProyectos/pierna-derecha-ca.obj");
+    Model pjPiernaIzq   ((char*)"ModelsProyectos/pierna-izquierda-ca.obj");
+    Model pjRodillaDer  ((char*)"ModelsProyectos/rodilla-derecha-ca.obj");
+    Model pjRodillaIzq  ((char*)"ModelsProyectos/rodilla-izquierda-ca.obj");
+
     lightingShader.Use();
     glUniform1i(glGetUniformLocation(lightingShader.Program, "material.diffuse"),  0);
     glUniform1i(glGetUniformLocation(lightingShader.Program, "material.specular"), 1);
+
+    // Lista final de flamas (nuevas + camino)
+    construirFlamas();
+
+    // Aviso: el arreglo flamePos de lighting.frag debe tener espacio para todas las flamas
+    {
+        GLint nUniforms = 0;
+        glGetProgramiv(lightingShader.Program, GL_ACTIVE_UNIFORMS, &nUniforms);
+        for (GLint i = 0; i < nUniforms; ++i) {
+            char name[128]; GLsizei len = 0; GLint size = 0; GLenum type = 0;
+            glGetActiveUniform(lightingShader.Program, i, sizeof(name), &len, &size, &type, name);
+            if (std::string(name).rfind("flamePos", 0) == 0 && size < totalFlamas) {
+                std::cout << "AVISO: lighting.frag solo tiene espacio para " << size
+                          << " flamas y hay " << totalFlamas
+                          << ". Aumenta el tamano del arreglo flamePos (y el limite del for)." << std::endl;
+            }
+        }
+    }
 
     // Configuración del Texto UI
     GLuint textVAO, textVBO, textEBO;
@@ -397,6 +717,9 @@ int main()
     glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 16, (void*)0);
     glBindVertexArray(0);
 
+    // Las 3 mariposas (posicion inicial, aleteo y vuelo)
+    std::vector<Mariposas::Mariposa> mariposas = Mariposas::crear();
+
     camera.SetYaw(0.0f);
 
     while (!glfwWindowShouldClose(window))
@@ -415,13 +738,18 @@ int main()
         if (currentCameraMode == FIRST_PERSON) {
             renderCamPos = playerPos + glm::vec3(0.0f, eyeHeight, 0.0f);
             view = glm::lookAt(renderCamPos, renderCamPos + front, glm::vec3(0.0f, 1.0f, 0.0f));
+        } else if (currentCameraMode == THIRD_PERSON_GTA) {
+            // Camara detras del personaje: el mouse la orbita alrededor de el
+            glm::vec3 target = playerPos + glm::vec3(0.0f, GTA_ALTURA_OBJETIVO, 0.0f);
+            renderCamPos = posicionCamaraGTA(target, front);
+            view = glm::lookAt(renderCamPos, target, glm::vec3(0.0f, 1.0f, 0.0f));
         } else {
             glm::vec3 target = playerPos + glm::vec3(0.0f, eyeHeight, 0.0f);
             renderCamPos = target - front * 3.0f + glm::vec3(0.0f, 0.5f, 0.0f);
             view = glm::lookAt(renderCamPos, target, glm::vec3(0.0f, 1.0f, 0.0f));
         }
 
-        glClearColor(0.05f, 0.05f, 0.08f, 1.0f);
+        glClearColor(0.02f, 0.03f, 0.08f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         lightingShader.Use();
@@ -431,9 +759,9 @@ int main()
 
         // Luces
         setVec3 (prog, "dirLight.direction", -0.2f, -1.0f, -0.3f);
-        setVec3 (prog, "dirLight.ambient",    0.10f, 0.15f, 0.25f);
-        setVec3 (prog, "dirLight.diffuse",    0.30f, 0.35f, 0.55f);
-        setVec3 (prog, "dirLight.specular",   0.20f, 0.25f, 0.35f);
+        setVec3 (prog, "dirLight.ambient",    0.10f * LUZ_ESCENARIO, 0.15f * LUZ_ESCENARIO, 0.25f * LUZ_ESCENARIO);
+        setVec3 (prog, "dirLight.diffuse",    0.30f * LUZ_ESCENARIO, 0.35f * LUZ_ESCENARIO, 0.55f * LUZ_ESCENARIO);
+        setVec3 (prog, "dirLight.specular",   0.20f * LUZ_ESCENARIO, 0.25f * LUZ_ESCENARIO, 0.35f * LUZ_ESCENARIO);
 
         glm::vec3 lunaPos   (-10.0f, 5.0f, -12.0f);
         glm::vec3 lunaTarget(  2.0f, 0.0f,   0.0f);
@@ -445,9 +773,9 @@ int main()
         setFloat(prog, "spotLight.constant",    1.0f);
         setFloat(prog, "spotLight.linear",      0.005f);
         setFloat(prog, "spotLight.quadratic",   0.0005f);
-        setVec3 (prog, "spotLight.ambient",     0.08f, 0.10f, 0.18f);
-        setVec3 (prog, "spotLight.diffuse",     0.80f, 0.90f, 1.10f);
-        setVec3 (prog, "spotLight.specular",    0.30f, 0.40f, 0.60f);
+        setVec3 (prog, "spotLight.ambient",     0.08f * LUZ_ESCENARIO, 0.10f * LUZ_ESCENARIO, 0.18f * LUZ_ESCENARIO);
+        setVec3 (prog, "spotLight.diffuse",     0.80f * LUZ_ESCENARIO, 0.90f * LUZ_ESCENARIO, 1.10f * LUZ_ESCENARIO);
+        setVec3 (prog, "spotLight.specular",    0.30f * LUZ_ESCENARIO, 0.40f * LUZ_ESCENARIO, 0.60f * LUZ_ESCENARIO);
 
         // ── LUCES DE LAS VELAS: TODAS ENCENDIDAS ──
         // El shader calcula la luz de cada vela, asi el panteon se ve parejo
@@ -465,7 +793,20 @@ int main()
         GLint transLoc = glGetUniformLocation(prog, "transparency");
 
         // Iluminación del piso uniforme
-        setVec3(prog, "floorGlow", 0.12f, 0.05f, 0.02f);
+        setVec3(prog, "floorGlow", 0.12f * LUZ_PISO, 0.05f * LUZ_PISO, 0.02f * LUZ_PISO);
+
+        // ══════ CIELO NOCTURNO ══════
+        glDisable(GL_DEPTH_TEST); // Apagamos profundidad para que quede al fondo
+        setEmission(prog, BRILLO_CIELO, BRILLO_CIELO, BRILLO_CIELO); // Brillo del cielo (no le afectan las velas)
+        glUniform1i(transLoc, 0);
+
+        glm::mat4 modelCielo = glm::mat4(1.0f);
+        modelCielo = glm::translate(modelCielo, renderCamPos); // Sigue a la cámara
+        modelCielo = glm::scale(modelCielo, glm::vec3(20.0f)); // Escala gigante
+        glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(modelCielo));
+        cielo.Draw(lightingShader);
+
+        glEnable(GL_DEPTH_TEST); // Encendemos profundidad de nuevo para el cementerio
 
         // ESCENARIO
         setEmission(prog, 0.0f, 0.0f, 0.0f);
@@ -576,6 +917,74 @@ int main()
             }
         }
 
+        // ══════ MARIPOSAS ══════
+        // transparency = 1 respeta la transparencia de la textura de las alas
+        // (si se ven raras o semitransparentes, cambialo a 0).
+        // El emissive da un leve brillo para que no se pierdan en la noche.
+        setEmission(prog, 0.12f, 0.08f, 0.04f);
+        glUniform1i(transLoc, 1);
+        for (Mariposas::Mariposa& m : mariposas) {
+            Mariposas::actualizar(m, deltaTime);
+            Mariposas::Mats mm = Mariposas::construir(m, now);
+
+            glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(mm.cuerpo));
+            mariposaCuerpo.Draw(lightingShader);
+            glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(mm.alaDer));
+            mariposaAlaDer.Draw(lightingShader);
+            glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(mm.alaIzq));
+            mariposaAlaIzq.Draw(lightingShader);
+        }
+        setEmission(prog, 0.0f, 0.0f, 0.0f);
+
+        // ══════ PERSONAJE (solo con la camara GTA) ══════
+        if (currentCameraMode == THIRD_PERSON_GTA) {
+            // emissive: leve brillo para que se vea de noche
+            setEmission(prog, 0.05f, 0.045f, 0.04f);
+            glUniform1i(transLoc, 0);
+
+            Personaje::Mats pm = Personaje::construir(playerPos, personaje);
+            const glm::mat4 PM[9] = {
+                pm.torso, pm.hombroDer, pm.hombroIzq, pm.codoDer, pm.codoIzq,
+                pm.piernaDer, pm.piernaIzq, pm.rodillaDer, pm.rodillaIzq
+            };
+            Model* piezasPJ[9] = {
+                &pjTorso, &pjHombroDer, &pjHombroIzq, &pjCodoDer, &pjCodoIzq,
+                &pjPiernaDer, &pjPiernaIzq, &pjRodillaDer, &pjRodillaIzq
+            };
+            for (int k = 0; k < 9; ++k) {
+                glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(PM[k]));
+                piezasPJ[k]->Draw(lightingShader);
+            }
+            setEmission(prog, 0.0f, 0.0f, 0.0f);
+        }
+
+        // ══════ VELADORAS (translucidas) ══════
+        // Se dibujan al final, despues de todo lo opaco y sin escribir profundidad,
+        // para que se vea a traves de ellas lo que hay detras.
+        // La opacidad es fija (VELADORA_OPACIDAD) y no depende del shader.
+        setEmission(prog, 0.0f, 0.0f, 0.0f);
+        glUniform1i(transLoc, 1);
+        glEnable(GL_BLEND);
+        glBlendColor(0.0f, 0.0f, 0.0f, VELADORA_OPACIDAD);
+        glBlendFunc(GL_CONSTANT_ALPHA, GL_ONE_MINUS_CONSTANT_ALPHA);
+        glDepthMask(GL_FALSE);
+
+        // Cada tipo usa su propio modelo, dibujado en cada una de sus posiciones.
+        auto dibujarVeladoras = [&](Model& m, const glm::vec3* posiciones, int cantidad) {
+            for (int i = 0; i < cantidad; ++i) {
+                glm::mat4 mv = glm::translate(glm::mat4(1.0f), posiciones[i]);
+                glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(mv));
+                m.Draw(lightingShader);
+            }
+        };
+        dibujarVeladoras(velAzul,     VELADORAS_AZULES,    (int)(sizeof(VELADORAS_AZULES)    / sizeof(glm::vec3)));
+        dibujarVeladoras(velRoja,     VELADORAS_ROJAS,     (int)(sizeof(VELADORAS_ROJAS)     / sizeof(glm::vec3)));
+        dibujarVeladoras(velRoja2,    VELADORAS2_ROJAS,    (int)(sizeof(VELADORAS2_ROJAS)    / sizeof(glm::vec3)));
+        dibujarVeladoras(velAmarilla, VELADORAS_AMARILLAS, (int)(sizeof(VELADORAS_AMARILLAS) / sizeof(glm::vec3)));
+
+        glDepthMask(GL_TRUE);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
         // DIBUJAR TEXTO (UI)
         if (mensajeTimer > 0.0f) {
             mensajeTimer -= deltaTime;
@@ -635,6 +1044,44 @@ void DoMovement()
         return;
     }
 
+    // ── CAMARA GTA: el personaje camina hacia donde apunta la camara ──
+    // W avanza, S retrocede, A/D se mueven de lado (siempre respecto a la camara);
+    // el personaje gira suavemente hacia donde camina y mueve brazos y piernas.
+    if (currentCameraMode == THIRD_PERSON_GTA) {
+        glm::vec3 fwd = glm::normalize(glm::vec3(f.x, 0.0f, f.z));
+        glm::vec3 rgt = glm::normalize(glm::cross(fwd, glm::vec3(0.0f, 1.0f, 0.0f)));
+
+        glm::vec3 dir(0.0f);
+        if (keys[GLFW_KEY_W] || keys[GLFW_KEY_UP])    dir += fwd;
+        if (keys[GLFW_KEY_S] || keys[GLFW_KEY_DOWN])  dir -= fwd;
+        if (keys[GLFW_KEY_A] || keys[GLFW_KEY_LEFT])  dir -= rgt;
+        if (keys[GLFW_KEY_D] || keys[GLFW_KEY_RIGHT]) dir += rgt;
+
+        glm::vec3 antes = playerPos;
+
+        if (glm::length(dir) > 0.001f) {
+            dir = glm::normalize(dir);
+            glm::vec3 move = dir * Personaje::VEL_CAMINAR * deltaTime;
+
+            // Pasos pequenos para no atravesar paredes
+            int steps = std::max(1, (int)std::ceil(glm::length(move) / 0.02f));
+            for (int i = 0; i < steps; ++i) {
+                playerPos += move / (float)steps;
+                resolveWallCollisions(playerPos, PERSONAJE_RADIO);
+            }
+
+            // El personaje mira hacia donde camina
+            Personaje::girarHacia(personaje, std::atan2(-dir.z, dir.x), deltaTime);
+        }
+
+        playerPos.y = getFloorHeight(playerPos.x, playerPos.z);
+
+        // La caminata avanza segun la distancia que realmente recorrio
+        float recorrido = glm::length(glm::vec2(playerPos.x - antes.x, playerPos.z - antes.z));
+        Personaje::avanzarAnimacion(personaje, recorrido, deltaTime);
+        return;
+    }
+
     glm::vec3 forward = glm::normalize(glm::vec3(f.x, 0.0f, f.z));
     glm::vec3 right = glm::normalize(glm::cross(forward, glm::vec3(0.0f, 1.0f, 0.0f)));
 
@@ -666,17 +1113,30 @@ void KeyCallback(GLFWwindow* w, int key, int, int action, int)
     }
 
     if (key == GLFW_KEY_C && action == GLFW_PRESS) {
-        currentCameraMode = (CameraMode)((currentCameraMode + 1) % 3);
-        
-        if (currentCameraMode == THIRD_PERSON_FREE) {
-            playerPos = STAIRS_START;
-            camera.SetYaw(0.0f); 
-            std::cout << "Camara: Tercera Persona Libre." << std::endl;
-        } else if (currentCameraMode == THIRD_PERSON_RESTRICTED) {
-            std::cout << "Camara: Tercera Persona Restringida." << std::endl;
+        currentCameraMode = (CameraMode)((currentCameraMode + 1) % TOTAL_CAMERA_MODES);
+
+        if (currentCameraMode == THIRD_PERSON_GTA) {
+            // El personaje aparece donde lo pusiste en Blender, mirando hacia +X
+            playerPos = Personaje::INICIO;
+            personaje = Personaje::Estado();
+            camera.SetPitchLimits(GTA_PITCH_MIN, GTA_PITCH_MAX);
+            camera.SetYaw(0.0f);
+            camera.SetPitch(GTA_PITCH_INICIAL);
+            std::cout << "Camara: Tercera Persona estilo GTA." << std::endl;
         } else {
-            playerPos = STAIRS_START;   // al salir del modo libre se regresa al punto de inicio
-            std::cout << "Camara: Primera Persona" << std::endl;
+            // Los demas modos usan el rango normal de inclinacion
+            camera.SetPitchLimits(-89.0f, 89.0f);
+
+            if (currentCameraMode == THIRD_PERSON_FREE) {
+                playerPos = STAIRS_START;
+                camera.SetYaw(0.0f); 
+                std::cout << "Camara: Tercera Persona Libre." << std::endl;
+            } else if (currentCameraMode == THIRD_PERSON_RESTRICTED) {
+                std::cout << "Camara: Tercera Persona Restringida." << std::endl;
+            } else {
+                playerPos = STAIRS_START;   // al salir del modo libre se regresa al punto de inicio
+                std::cout << "Camara: Primera Persona" << std::endl;
+            }
         }
     }
 

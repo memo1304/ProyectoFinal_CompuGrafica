@@ -1,0 +1,2185 @@
+# Blender 5.2.2 LTS MTL File: 'proyecto.blend'
+# www.blender.org
+
+newmtl Mantel
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/blanco.jpg
+
+newmtl Mantel.001
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/blanco.jpg
+
+newmtl Marco
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/foto-difunto.png
+
+newmtl Marco.001
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/foto-difunto.png
+
+newmtl Marco.002
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/foto-difunto.png
+
+newmtl Marco.003
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/foto-difunto.png
+
+newmtl Marco.004
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/foto-difunto.png
+
+newmtl Marco.005
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/foto-difunto.png
+
+newmtl Marco.006
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/foto-difunto.png
+
+newmtl Marco.007
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/foto-difunto.png
+
+newmtl Marco.008
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/foto-difunto.png
+
+newmtl Marco.009
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/foto-difunto.png
+
+newmtl Material.001
+Ns 282.488037
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 1
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/Sopa.png
+
+newmtl Material.002
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 1
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/Plato de Greda.png
+
+newmtl Material.003
+Ns 0.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/flor.png
+map_Bump -bm 6.000000 /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/flor-1.png
+
+newmtl Material.004
+Ns 0.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/flor.png
+map_Bump -bm 6.000000 /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/flor-1.png
+
+newmtl Material.005
+Ns 282.488037
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 1
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/Sopa.png
+
+newmtl Material.006
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 1
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/Plato de Greda.png
+
+newmtl Material.007
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 1
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/Plato de Greda.png
+
+newmtl Material.008
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 1
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/Plato de Greda.png
+
+newmtl Material.009
+Ns 360.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/textura-pan.png
+
+newmtl Material.010
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 1
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/Papa.png
+
+newmtl Material.011
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 1
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/Zapallo.png
+
+newmtl Material.012
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 1
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/Choclo.png
+
+newmtl Material.013
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 1
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/Plato de Greda.png
+
+newmtl Material.014
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 1
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/Plato de Greda.png
+
+newmtl Material.015
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 1
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/Carne Vacuno.png
+
+newmtl Material.016
+Ns 360.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/textura-pan.png
+
+newmtl Material.017
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 1
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/Papa.png
+
+newmtl Material.018
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 1
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/Zapallo.png
+
+newmtl Material.019
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 1
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/Choclo.png
+
+newmtl Material.020
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 1
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/Carne Vacuno.png
+
+newmtl Material.021
+Ns 282.488037
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 1
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/Sopa.png
+
+newmtl Material.022
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 1
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/Plato de Greda.png
+
+newmtl Material.023
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 1
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/Plato de Greda.png
+
+newmtl Material.024
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 1
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/Plato de Greda.png
+
+newmtl Material.025
+Ns 360.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/textura-pan.png
+
+newmtl Material.026
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 1
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/Papa.png
+
+newmtl Material.027
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 1
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/Zapallo.png
+
+newmtl Material.028
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 1
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/Choclo.png
+
+newmtl Material.029
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 1
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/Carne Vacuno.png
+
+newmtl Material.030
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/textura-tierra.png
+
+newmtl Material.031
+Ns 0.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/flor.png
+map_Bump -bm 6.000000 /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/flor-1.png
+
+newmtl Material.032
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/textura-tierra.png
+
+newmtl Material.033
+Ns 0.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/flor.png
+map_Bump -bm 6.000000 /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/flor-1.png
+
+newmtl Material.034
+Ns 282.488037
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 1
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/Sopa.png
+
+newmtl Material.035
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 1
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/Plato de Greda.png
+
+newmtl Material.036
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 1
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/Plato de Greda.png
+
+newmtl Material.037
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 1
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/Plato de Greda.png
+
+newmtl Material.038
+Ns 360.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/textura-pan.png
+
+newmtl Material.039
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 1
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/Papa.png
+
+newmtl Material.040
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 1
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/Zapallo.png
+
+newmtl Material.041
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 1
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/Choclo.png
+
+newmtl Material.042
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 1
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/Carne Vacuno.png
+
+newmtl Material.043
+Ns 282.488037
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 1
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/Sopa.png
+
+newmtl Material.044
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 1
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/Plato de Greda.png
+
+newmtl Material.045
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 1
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/Plato de Greda.png
+
+newmtl Material.046
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 1
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/Plato de Greda.png
+
+newmtl Material.047
+Ns 360.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/textura-pan.png
+
+newmtl Material.048
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 1
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/Papa.png
+
+newmtl Material.049
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 1
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/Zapallo.png
+
+newmtl Material.050
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 1
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/Choclo.png
+
+newmtl Material.051
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 1
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/Carne Vacuno.png
+
+newmtl Material.052
+Ns 0.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/flor.png
+map_Bump -bm 6.000000 /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/flor-1.png
+
+newmtl Material.053
+Ns 282.488037
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 1
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/Sopa.png
+
+newmtl Material.054
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 1
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/Plato de Greda.png
+
+newmtl Material.055
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 1
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/Plato de Greda.png
+
+newmtl Material.056
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 1
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/Plato de Greda.png
+
+newmtl Material.057
+Ns 360.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/textura-pan.png
+
+newmtl Material.058
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 1
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/Papa.png
+
+newmtl Material.059
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 1
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/Zapallo.png
+
+newmtl Material.060
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 1
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/Choclo.png
+
+newmtl Material.061
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 1
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/Carne Vacuno.png
+
+newmtl Material.062
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/textura-tierra.png
+
+newmtl Material.063
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/textura-piedra-pared.png
+
+newmtl Material.064
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/textura-cruz.png
+
+newmtl Material.065
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/textura-tierra-panteon.png
+
+newmtl Material.066
+Ns 0.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/flor.png
+map_Bump -bm 6.000000 /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/flor-1.png
+
+newmtl Material.067
+Ns 282.488037
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 1
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/Sopa.png
+
+newmtl Material.068
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 1
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/Plato de Greda.png
+
+newmtl Material.069
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 1
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/Plato de Greda.png
+
+newmtl Material.070
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 1
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/Plato de Greda.png
+
+newmtl Material.071
+Ns 360.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/textura-pan.png
+
+newmtl Material.072
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 1
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/Papa.png
+
+newmtl Material.073
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 1
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/Zapallo.png
+
+newmtl Material.074
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 1
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/Choclo.png
+
+newmtl Material.075
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 1
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/Carne Vacuno.png
+
+newmtl Material.076
+Ns 282.488037
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 1
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/Sopa.png
+
+newmtl Material.077
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 1
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/Plato de Greda.png
+
+newmtl Material.078
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 1
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/Plato de Greda.png
+
+newmtl Material.079
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 1
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/Plato de Greda.png
+
+newmtl Material.080
+Ns 360.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/textura-pan.png
+
+newmtl Material.081
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 1
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/Papa.png
+
+newmtl Material.082
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 1
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/Zapallo.png
+
+newmtl Material.083
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 1
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/Choclo.png
+
+newmtl Material.084
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 1
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/Carne Vacuno.png
+
+newmtl Material.085
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/textura-tierra.png
+
+newmtl Material.086
+Ns 0.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/flor.png
+map_Bump -bm 6.000000 /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/flor-1.png
+
+newmtl Material.087
+Ns 282.488037
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 1
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/Sopa.png
+
+newmtl Material.088
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 1
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/Plato de Greda.png
+
+newmtl Material.089
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 1
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/Plato de Greda.png
+
+newmtl Material.090
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 1
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/Plato de Greda.png
+
+newmtl Material.091
+Ns 360.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/textura-pan.png
+
+newmtl Material.092
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 1
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/Papa.png
+
+newmtl Material.093
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 1
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/Zapallo.png
+
+newmtl Material.094
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 1
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/Choclo.png
+
+newmtl Material.095
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 1
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/Carne Vacuno.png
+
+newmtl Material.096
+Ns 0.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/flor.png
+map_Bump -bm 6.000000 /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/flor-1.png
+
+newmtl Material.097
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/textura-tierra.png
+
+newmtl Material.098
+Ns 0.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/flor.png
+map_Bump -bm 6.000000 /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/flor-1.png
+
+newmtl Material.099
+Ns 282.488037
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 1
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/Sopa.png
+
+newmtl Material.100
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 1
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/Plato de Greda.png
+
+newmtl Material.101
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 1
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/Plato de Greda.png
+
+newmtl Material.102
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 1
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/Plato de Greda.png
+
+newmtl Material.103
+Ns 360.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/textura-pan.png
+
+newmtl Material.104
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 1
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/Papa.png
+
+newmtl Material.105
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 1
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/Zapallo.png
+
+newmtl Material.106
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 1
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/Choclo.png
+
+newmtl Material.107
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 1
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/Carne Vacuno.png
+
+newmtl Material.108
+Ns 0.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/flor.png
+map_Bump -bm 6.000000 /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/flor-1.png
+
+newmtl PANCITO.001
+Ns 360.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/textura-pan.png
+
+newmtl PANCITO.002
+Ns 360.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/textura-pan.png
+
+newmtl PANCITO.003
+Ns 360.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/textura-pan.png
+
+newmtl PANCITO.004
+Ns 360.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/textura-pan.png
+
+newmtl PANCITO.005
+Ns 360.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/textura-pan.png
+
+newmtl PANCITO.006
+Ns 360.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/textura-pan.png
+
+newmtl PANCITO.007
+Ns 360.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/textura-pan.png
+
+newmtl PANCITO.008
+Ns 360.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/textura-pan.png
+
+newmtl PANCITO.009
+Ns 360.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/textura-pan.png
+
+newmtl PANCITO.010
+Ns 360.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/textura-pan.png
+
+newmtl base-puerta
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd textura-pared-desgastada.png
+
+newmtl cemento
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/textura-cemento.png
+
+newmtl cemento.001
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/textura-cemento.png
+
+newmtl cruz
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/textura-cruz.png
+
+newmtl cruz-madera
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/textura-madera.png
+
+newmtl cruz-madera.001
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/textura-madera.png
+
+newmtl cruz-madera.002
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/textura-madera.png
+
+newmtl cruz.001
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/textura-cruz.png
+
+newmtl cruz.002
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/textura-cruz.png
+
+newmtl cruz.003
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/textura-cruz.png
+
+newmtl cruz.004
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/textura-cruz.png
+
+newmtl cruz.005
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd /Users/lamamalona/Downloads/textura-cruz.png
+
+newmtl escalon
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/textura-base-tumba.png
+
+newmtl escalon.001
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/textura-base-tumba.png
+
+newmtl flama
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd textura-vela-flama.png
+
+newmtl foto
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/foto3.png
+
+newmtl foto.001
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 1
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/foto.png
+
+newmtl foto.002
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/foto2.png
+
+newmtl foto.003
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/foto.png
+
+newmtl foto.004
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/foto3.png
+
+newmtl foto.005
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 1
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/foto.png
+
+newmtl foto.006
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/foto2.png
+
+newmtl foto.007
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/foto3.png
+
+newmtl foto.008
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/foto.png
+
+newmtl foto.009
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/foto2.png
+
+newmtl lago.003
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/textura-lago.png
+
+newmtl lima
+Ns 20.000006
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 1
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/lime_texture.png
+
+newmtl lima.001
+Ns 20.000006
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 1
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/lime_texture.png
+
+newmtl lima.002
+Ns 20.000006
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 1
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/lime_texture.png
+
+newmtl lima.003
+Ns 20.000006
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+illum 1
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/lime_texture.png
+map_d /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/lime_texture.png
+
+newmtl lima.004
+Ns 20.000006
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 1
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/lime_texture.png
+
+newmtl lima.005
+Ns 20.000006
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 1
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/lime_texture.png
+
+newmtl lima.006
+Ns 20.000006
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 1
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/lime_texture.png
+
+newmtl lima.007
+Ns 20.000006
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 1
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/lime_texture.png
+
+newmtl lima.008
+Ns 20.000006
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+illum 1
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/lime_texture.png
+map_d /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/lime_texture.png
+
+newmtl lima.009
+Ns 20.000006
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 1
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/lime_texture.png
+
+newmtl limon
+Ns 20.000006
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 1
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/lemon_texture.png
+
+newmtl limon.001
+Ns 20.000006
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 1
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/lemon_texture.png
+
+newmtl limon.002
+Ns 20.000006
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 1
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/lemon_texture.png
+
+newmtl limon.003
+Ns 20.000006
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+illum 1
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/lemon_texture.png
+map_d /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/lemon_texture.png
+
+newmtl limon.004
+Ns 20.000006
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 1
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/lemon_texture.png
+
+newmtl limon.005
+Ns 20.000006
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 1
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/lemon_texture.png
+
+newmtl limon.006
+Ns 20.000006
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 1
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/lemon_texture.png
+
+newmtl limon.007
+Ns 20.000006
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 1
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/lemon_texture.png
+
+newmtl limon.008
+Ns 20.000006
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+illum 1
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/lemon_texture.png
+map_d /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/lemon_texture.png
+
+newmtl limon.009
+Ns 20.000006
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 1
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/lemon_texture.png
+
+newmtl madera
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/textura-madera.png
+
+newmtl madera.001
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/textura-madera.png
+
+newmtl madera.002
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/textura-madera.png
+
+newmtl mantel
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/blanco.jpg
+
+newmtl mantel.001
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/blanco.jpg
+
+newmtl mantel.002
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/blanco.jpg
+
+newmtl naranja
+Ns 20.000006
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 1
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/orange_texture.png
+
+newmtl naranja.001
+Ns 20.000006
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 1
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/orange_texture.png
+
+newmtl naranja.002
+Ns 20.000006
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 1
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/orange_texture.png
+
+newmtl naranja.003
+Ns 20.000006
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 1
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/orange_texture.png
+
+newmtl naranja.004
+Ns 20.000006
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 1
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/orange_texture.png
+
+newmtl naranja.005
+Ns 20.000006
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 1
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/orange_texture.png
+
+newmtl naranja.006
+Ns 20.000006
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 1
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/orange_texture.png
+
+newmtl naranja.007
+Ns 20.000006
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 1
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/orange_texture.png
+
+newmtl naranja.008
+Ns 20.000006
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 1
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/orange_texture.png
+
+newmtl naranja.009
+Ns 20.000006
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 1
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/orange_texture.png
+
+newmtl pared.003
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+
+newmtl pared_desgastada.003
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/textura-pared-desgastada.png
+
+newmtl petalos
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/flor.png
+
+newmtl petalos.001
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/flor.png
+
+newmtl platano
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/textura-platano.png
+
+newmtl platano.001
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/textura-platano.png
+
+newmtl platano.002
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/textura-platano.png
+
+newmtl platano.003
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/textura-platano.png
+
+newmtl platano.004
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/textura-platano.png
+
+newmtl platano.005
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/textura-platano.png
+
+newmtl platano.006
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/textura-platano.png
+
+newmtl platano.007
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/textura-platano.png
+
+newmtl platano.008
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/textura-platano.png
+
+newmtl platano.009
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/textura-platano.png
+
+newmtl porcelanato
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/textura-porcelanato.png
+
+newmtl porcelanato-cruz
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/textura-porcelanato.png
+
+newmtl porcelanato-cruz.001
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/textura-porcelanato.png
+
+newmtl porcelanato.001
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/textura-porcelanato.png
+
+newmtl puerta.003
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd textura-puerta.png
+
+newmtl techo.003
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/textura-tejado.png
+
+newmtl terreno.003
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/textura-terreno.png
+
+newmtl tierra
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/textura-tumba-flor.png
+map_Bump -bm 4.000000 /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/textura-cruz-f.png
+
+newmtl tierra.001
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/textura-tumba-flor.png
+map_Bump -bm 4.000000 /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/textura-cruz-f.png
+
+newmtl tierra.002
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/textura-tumba-flor.png
+map_Bump -bm 4.000000 /Users/lamamalona/Downloads/ProyectoFinal_CompuGrafica-main 2/ConfigInicial/ModelsProyectos/textura-cruz-f.png
+
+newmtl vela-base
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd textura-vela.png
