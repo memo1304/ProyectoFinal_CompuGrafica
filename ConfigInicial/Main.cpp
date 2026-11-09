@@ -13,6 +13,7 @@
 #include <iterator>
 #include <cstdlib>
 #include <thread>
+#include <csignal>
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
@@ -42,7 +43,7 @@ void playSound(const std::string& filename) {
     std::thread([filename]() {
         std::string cmd = "powershell -c (New-Object Media.SoundPlayer '" + filename + "').PlaySync();";
         std::system(cmd.c_str());
-        }).detach();
+    }).detach();
 #elif __APPLE__
     std::string cmd = "afplay " + filename + " > /dev/null 2>&1 &";
     std::system(cmd.c_str());
@@ -52,11 +53,25 @@ void playSound(const std::string& filename) {
 #endif
 }
 
+// ── Limpieza de audio al salir ──
+// Mata los procesos afplay asociados al proyecto para que no sigan sonando
+// cuando se cierra la ventana o se presiona Ctrl+C.
+void cleanupAudio() {
+#ifdef __APPLE__
+    std::system("pkill -f 'afplay.*campana' 2>/dev/null");
+    std::system("pkill -f 'afplay.*janitzio' 2>/dev/null");
+#endif
+}
+
+extern "C" void handleSigint(int) {
+    exit(0);   // dispara atexit -> cleanupAudio()
+}
+
 // ───────────── Configuración ─────────────
 const GLuint WIDTH = 1600, HEIGHT = 900;
 int SCREEN_WIDTH, SCREEN_HEIGHT;
 
-Camera  camera(glm::vec3(-2.014f, 1.199f, -1.36796f));
+Camera  camera(glm::vec3(-2.014f, 1.199f, -1.36796f)); 
 GLfloat lastX = WIDTH / 2.0f;
 GLfloat lastY = HEIGHT / 2.0f;
 bool    keys[1024];
@@ -65,37 +80,30 @@ bool    firstMouse = true;
 GLfloat deltaTime = 0.0f;
 GLfloat lastFrame = 0.0f;
 
-
 // ═══════════════════════════════════════════════════════════
 // SISTEMA DE CÁMARAS Y SUELO
 // ═══════════════════════════════════════════════════════════
-// La tecla C las recorre en este orden.
 enum CameraMode { FIRST_PERSON, THIRD_PERSON_GTA, THIRD_PERSON_RESTRICTED, THIRD_PERSON_FREE };
 const int TOTAL_CAMERA_MODES = 4;
 CameraMode currentCameraMode = FIRST_PERSON;
 
-// Posición inicial EXACTA en las puertas
 glm::vec3 playerPos = glm::vec3(-2.63651f, 0.699024f, -1.4178f);
-
-// Altura de la cámara ajustada a 0.5f
-const float eyeHeight = 0.5f;
-
+const float eyeHeight = 0.5f; 
 const glm::vec3 STAIRS_START = glm::vec3(-2.63651f, 0.699024f, -1.4178f);
 
 // ── Camara estilo GTA ──
-const float GTA_DISTANCIA = 1.10f;   // que tan atras queda la camara del personaje
-const float GTA_DISTANCIA_MIN = 0.30f;   // no se acerca mas que esto (por las paredes)
-const float GTA_ALTURA_OBJETIVO = 0.28f;   // punto al que mira (altura sobre los pies, ~pecho)
-const float GTA_PITCH_MIN = -50.0f;  // mirar hacia abajo (camara alta)
-const float GTA_PITCH_MAX = 15.0f;  // mirar hacia arriba (camara baja)
-const float GTA_PITCH_INICIAL = -15.0f;
-const float PERSONAJE_RADIO = 0.08f;   // "grosor" del personaje para chocar con paredes
+const float GTA_DISTANCIA       = 1.10f;
+const float GTA_DISTANCIA_MIN   = 0.30f;
+const float GTA_ALTURA_OBJETIVO = 0.28f;
+const float GTA_PITCH_MIN       = -50.0f;
+const float GTA_PITCH_MAX       =  15.0f;
+const float GTA_PITCH_INICIAL   = -15.0f;
+const float PERSONAJE_RADIO     = 0.08f;
 
 // ── Ambiente nocturno ──
-// 1.0 = como estaba antes; mas bajo = mas oscuro. Ninguna de estas afecta la luz de las flamas.
-const float LUZ_ESCENARIO = 0.45f;   // luz de luna sobre el escenario (direccional + reflector)
-const float BRILLO_CIELO = 0.55f;   // brillo del cielo (cielo.obj)
-const float LUZ_PISO = 1.00f;   // resplandor calido fijo del piso (subelo/bajalo si el piso se ve claro)
+const float LUZ_ESCENARIO = 0.45f;
+const float BRILLO_CIELO  = 0.55f;
+const float LUZ_PISO      = 1.00f;
 
 Personaje::Estado personaje;
 
@@ -103,8 +111,8 @@ Personaje::Estado personaje;
 float getFloorHeight(float x, float z) {
     const float MIN_X = -2.79187f;
     const float MAX_X = 0.064214f;
-    const float MIN_Z = -1.97263f;
-    const float MAX_Z = -0.724842f;
+    const float MIN_Z = -1.97263f;  
+    const float MAX_Z = -0.724842f; 
 
     if (x < MIN_X || x > MAX_X || z < MIN_Z || z > MAX_Z) {
         return 0.0f;
@@ -126,39 +134,27 @@ float getFloorHeight(float x, float z) {
 
 // ═══════════════════════════════════════════════════════════
 // COLISIONES CON PAREDES
-// Cada pared es un segmento en el plano XZ (vista desde arriba).
-// Las coordenadas vienen de Blender (X, Y, Z) y se convierten a OpenGL con:
-//      X_gl = X_blender,   Z_gl = -Y_blender      (la Z de Blender es la altura)
 // ═══════════════════════════════════════════════════════════
-struct Pared { glm::vec2 a, b; };      // (x, z) de cada extremo
+struct Pared { glm::vec2 a, b; };
 
-const float PLAYER_RADIUS = 0.15f;     // "grosor" del jugador; subelo si la camara se mete en las paredes
+const float PLAYER_RADIUS = 0.15f;
 
 const std::vector<Pared> PAREDES = {
-    // ── Frente de la iglesia (caras A, B, C, D de Blender) ──
-    { glm::vec2(-1.93240f, -0.724842f), glm::vec2(-1.93240f, -0.594801f) },  // enlace con el muro de las escaleras
-    { glm::vec2(-1.93240f, -0.594801f), glm::vec2(-2.00648f, -0.181302f) },  // Blender (-1.9324, 0.594801)  -> (-2.00648, 0.181302)
-    { glm::vec2(-2.00648f, -0.181302f), glm::vec2(-2.00648f,  0.162231f) },  // Blender (-2.00648, 0.181302) -> (-2.00648, -0.162231)
-    { glm::vec2(-2.00648f,  0.162231f), glm::vec2(-1.93240f,  0.575730f) },  // Blender (-2.00648,-0.162231) -> (-1.9324, -0.57573)
-    { glm::vec2(-1.93240f,  0.575730f), glm::vec2(-2.05728f,  0.974691f) },  // hacia el muro lateral
-
-    // ── Muro lateral (+Z), caras de Blender Y = -0.9747, -1.1491, -1.3857, -1.6008 ──
+    { glm::vec2(-1.93240f, -0.724842f), glm::vec2(-1.93240f, -0.594801f) },
+    { glm::vec2(-1.93240f, -0.594801f), glm::vec2(-2.00648f, -0.181302f) },
+    { glm::vec2(-2.00648f, -0.181302f), glm::vec2(-2.00648f,  0.162231f) },
+    { glm::vec2(-2.00648f,  0.162231f), glm::vec2(-1.93240f,  0.575730f) },
+    { glm::vec2(-1.93240f,  0.575730f), glm::vec2(-2.05728f,  0.974691f) },
     { glm::vec2(-2.05728f,  0.974691f), glm::vec2(-0.214722f, 1.149100f) },
-    { glm::vec2(-0.214722f, 1.149100f), glm::vec2(2.53337f,  1.385660f) },
-    { glm::vec2(2.53337f,  1.385660f), glm::vec2(3.94579f,  1.600840f) },
-    { glm::vec2(3.94579f,  1.600840f), glm::vec2(4.45445f,  1.600840f) },  // cierre de la esquina
-
-    // ── Muro del fondo (X = 4.45445, Blender Y = 0.132329) ──
-    { glm::vec2(4.45445f,  1.600840f), glm::vec2(4.45445f, -1.809860f) },
-
-    // ── Muro lateral (-Z), cara de Blender Y = 1.80986 ──
-    { glm::vec2(4.45445f, -1.809860f), glm::vec2(0.064214f, -1.809860f) },
-
-    // ── Contorno de las escaleras (usa la misma caja que getFloorHeight) ──
-    { glm::vec2(0.064214f, -1.809860f), glm::vec2(0.064214f, -1.97263f) }, // sella el rincon junto a la boca de las escaleras
-    { glm::vec2(0.064214f, -1.97263f),  glm::vec2(-2.79187f,  -1.97263f) }, // muro derecho / fondo
-    { glm::vec2(-2.79187f,  -1.97263f),  glm::vec2(-2.79187f,  -0.724842f) },// extremo de la plataforma
-    { glm::vec2(-2.79187f,  -0.724842f), glm::vec2(0.064214f, -0.724842f) } // muro izquierdo (caras de Blender Y = 0.724842)
+    { glm::vec2(-0.214722f, 1.149100f), glm::vec2( 2.53337f,  1.385660f) },
+    { glm::vec2( 2.53337f,  1.385660f), glm::vec2( 3.94579f,  1.600840f) },
+    { glm::vec2( 3.94579f,  1.600840f), glm::vec2( 4.45445f,  1.600840f) },
+    { glm::vec2( 4.45445f,  1.600840f), glm::vec2( 4.45445f, -1.809860f) },
+    { glm::vec2( 4.45445f, -1.809860f), glm::vec2( 0.064214f, -1.809860f) },
+    { glm::vec2( 0.064214f, -1.809860f), glm::vec2( 0.064214f, -1.97263f) },
+    { glm::vec2( 0.064214f, -1.97263f),  glm::vec2(-2.79187f,  -1.97263f) },
+    { glm::vec2(-2.79187f,  -1.97263f),  glm::vec2(-2.79187f,  -0.724842f) },
+    { glm::vec2(-2.79187f,  -0.724842f), glm::vec2( 0.064214f, -0.724842f) }
 };
 
 static glm::vec2 closestPointOnSegment(const glm::vec2& p, const glm::vec2& a, const glm::vec2& b)
@@ -170,7 +166,6 @@ static glm::vec2 closestPointOnSegment(const glm::vec2& p, const glm::vec2& a, c
     return a + t * ab;
 }
 
-// Saca al jugador de las paredes; al empujar en diagonal se desliza a lo largo de la pared
 static void resolveWallCollisions(glm::vec3& pos, float radius = PLAYER_RADIUS)
 {
     glm::vec2 p(pos.x, pos.z);
@@ -182,8 +177,7 @@ static void resolveWallCollisions(glm::vec3& pos, float radius = PLAYER_RADIUS)
             if (dist < radius) {
                 if (dist > 1e-5f) {
                     p = c + d / dist * radius;
-                }
-                else {
+                } else {
                     glm::vec2 e = w.b - w.a;
                     glm::vec2 n = glm::normalize(glm::vec2(-e.y, e.x));
                     p = c + n * radius;
@@ -195,17 +189,15 @@ static void resolveWallCollisions(glm::vec3& pos, float radius = PLAYER_RADIUS)
     pos.z = p.y;
 }
 
-// ── Posicion de la camara GTA: detras del personaje, sin atravesar paredes ni suelo ──
 static glm::vec3 posicionCamaraGTA(const glm::vec3& target, const glm::vec3& front)
 {
-    glm::vec3 dir = -front;                         // del personaje hacia la camara
+    glm::vec3 dir = -front;
     glm::vec2 o(target.x, target.z);
     glm::vec2 d(dir.x * GTA_DISTANCIA, dir.z * GTA_DISTANCIA);
 
-    // Si una pared queda entre el personaje y la camara, la camara se acerca
     float tMin = 1.0f;
     for (const Pared& w : PAREDES) {
-        glm::vec2 e = w.b - w.a;
+        glm::vec2 e  = w.b - w.a;
         glm::vec2 ao = w.a - o;
         float den = d.x * e.y - d.y * e.x;
         if (std::fabs(den) < 1e-8f) continue;
@@ -218,7 +210,6 @@ static glm::vec3 posicionCamaraGTA(const glm::vec3& target, const glm::vec3& fro
 
     glm::vec3 pos = target + dir * dist;
 
-    // Nunca debajo del piso
     float minY = getFloorHeight(pos.x, pos.z) + 0.06f;
     if (pos.y < minY) pos.y = minY;
     return pos;
@@ -227,56 +218,55 @@ static glm::vec3 posicionCamaraGTA(const glm::vec3& target, const glm::vec3& fro
 // ═══════════════════════════════════════════════════════════
 // CAMPANA
 // ═══════════════════════════════════════════════════════════
-const glm::vec3 BELL_POSITION = glm::vec3(-2.0059f, 1.5588f, -1.3899f);
+const glm::vec3 BELL_POSITION    = glm::vec3(-2.0059f, 1.5588f, -1.3899f);
 const glm::vec3 CLAPPER_POSITION = glm::vec3(-2.0064f, 1.4668f, -1.3872f);
 const float     BELL_PIVOT_HEIGHT = 0.4f;
-const glm::vec3 BELL_PIVOT = BELL_POSITION + glm::vec3(0.0f, BELL_PIVOT_HEIGHT, 0.0f);
-const float BELL_NEAR_DISTANCE = 3.0f;
-const float BELL_SWING_DURATION = 17.0f;
-const float BELL_TOLL_TIMES[] = { 0.0f, 2.7f, 5.8f, 8.5f, 11.6f, 14.0f };
-const int   BELL_TOLL_COUNT = 6;
-bool  bellSwingActive = false;
+const glm::vec3 BELL_PIVOT        = BELL_POSITION + glm::vec3(0.0f, BELL_PIVOT_HEIGHT, 0.0f);
+const float BELL_NEAR_DISTANCE  = 3.0f;
+const float BELL_SWING_DURATION = 19.6f;
+const float BELL_TOLL_TIMES[] = { 0.0f, 2.7f, 4.8f, 8.5f, 11.5f, 14.0f };
+const int   BELL_TOLL_COUNT   = 6;
+bool  bellSwingActive    = false;
 float bellSwingStartTime = 0.0f;
 
 // ═══════════════════════════════════════════════════════════
 // TUMBAS INTERACTIVAS
-// (Sin acentos ni ñ porque stb_easy_font no los dibuja bien)
 // ═══════════════════════════════════════════════════════════
 struct TumbaInteractiva {
     glm::vec3 posicion;
-    int tecla;
+    int tecla;          
     std::string dato;
 };
 
 const TumbaInteractiva TUMBAS[10] = {
-    { glm::vec3(0.693586f, -0.000725f, -0.411303f), GLFW_KEY_1,
+    { glm::vec3( 0.693586f, -0.000725f, -0.411303f), GLFW_KEY_1,
       "1. Para los purepechas, los muertos no se van para siempre: regresan cada noviembre. Esperarlos es decirles que siguen siendo parte de la familia." },
 
-    { glm::vec3(1.177570f, -0.015488f, -1.487300f), GLFW_KEY_2,
+    { glm::vec3( 1.177570f, -0.015488f, -1.487300f), GLFW_KEY_2,
       "2. En Janitzio la espera se llama velacion. Las familias pasan la noche en vela junto a la tumba para recibir a las almas y acompanarlas hasta el amanecer." },
 
-    { glm::vec3(2.391750f,  0.014538f, -0.450766f), GLFW_KEY_3,
+    { glm::vec3( 2.391750f,  0.014538f, -0.450766f), GLFW_KEY_3,
       "3. Las velas encendidas son la luz que guia a las almas desde el otro mundo hasta su tumba. Mientras mas velas, mas facil encuentran el camino." },
 
-    { glm::vec3(2.637270f,  0.006454f, -1.515720f), GLFW_KEY_4,
+    { glm::vec3( 2.637270f,  0.006454f, -1.515720f), GLFW_KEY_4,
       "4. La flor de cempasuchil, con su color y aroma intensos, marca el camino de las almas. Sus petalos se riegan desde la entrada hasta la tumba." },
 
-    { glm::vec3(3.177310f, -0.001129f, -1.463610f), GLFW_KEY_5,
+    { glm::vec3( 3.177310f, -0.001129f, -1.463610f), GLFW_KEY_5,
       "5. La ofrenda lleva la comida y la bebida favoritas del difunto. Se cree que las almas no comen: se alimentan del aroma y la esencia de los alimentos." },
 
-    { glm::vec3(3.492020f,  0.005087f, -0.969270f), GLFW_KEY_6,
+    { glm::vec3( 3.492020f,  0.005087f, -0.969270f), GLFW_KEY_6,
       "6. El 1 de noviembre se espera a las almas de los ninos, los angelitos, con juguetes, dulces y atole. El 2 de noviembre llegan las de los adultos." },
 
-    { glm::vec3(3.93916f,   0.0f,      0.8662f),    GLFW_KEY_7,
+    { glm::vec3( 3.93916f,   0.0f,      0.8662f),    GLFW_KEY_7,
       "7. El copal es un incienso prehispanico. Su humo limpia el ambiente y sirve de puente para que las almas lleguen a la ofrenda." },
 
-    { glm::vec3(2.990680f,  0.003724f,  1.186180f), GLFW_KEY_8,
+    { glm::vec3( 2.990680f,  0.003724f,  1.186180f), GLFW_KEY_8,
       "8. La Danza de los Pescadores es una tradicion purepecha que rinde homenaje al lago y a quienes vivieron de el, incluidos los que ya no estan." },
 
-    { glm::vec3(1.962760f,  0.008751f,  0.746883f), GLFW_KEY_9,
+    { glm::vec3( 1.962760f,  0.008751f,  0.746883f), GLFW_KEY_9,
       "9. Las mariposas monarca llegan a Michoacan por estas fechas, y muchas personas creen que son las almas de los difuntos que vienen de visita." },
 
-    { glm::vec3(0.418023f, -0.079952f,  0.732683f), GLFW_KEY_0,
+    { glm::vec3( 0.418023f, -0.079952f,  0.732683f), GLFW_KEY_0,
       "10. Recordar a quienes se fueron es la esencia del Dia de Muertos: mientras alguien los espere con una ofrenda, siguen vivos en la memoria de su gente." }
 };
 
@@ -294,20 +284,20 @@ struct PescadorPose {
 
 const PescadorPose PESCADORES[3] = {
     {
-        glm::vec3(3.27893f, -2.29082f, 9.68666f), glm::vec3(3.29460f, -1.89427f, 9.69836f),
-        glm::vec3(3.29252f, -2.05658f, 9.69458f), glm::vec3(3.35132f, -1.97485f, 9.71129f),
-        glm::vec3(3.36824f, -2.00691f, 9.70975f), glm::vec3(3.23667f, -1.96439f, 9.71338f),
-        glm::vec3(3.22378f, -2.00329f, 9.71241f), glm::vec3(3.29318f, -2.05586f, 9.69561f),
-        glm::vec3(3.33037f, -2.17894f, 9.69834f), glm::vec3(3.25794f, -2.17927f, 9.69636f),
-        glm::vec3(3.21595f, -2.10868f, 9.69014f)
+        glm::vec3( 3.27893f, -2.29082f, 9.68666f), glm::vec3( 3.29460f, -1.89427f, 9.69836f),
+        glm::vec3( 3.29252f, -2.05658f, 9.69458f), glm::vec3( 3.35132f, -1.97485f, 9.71129f),
+        glm::vec3( 3.36824f, -2.00691f, 9.70975f), glm::vec3( 3.23667f, -1.96439f, 9.71338f),
+        glm::vec3( 3.22378f, -2.00329f, 9.71241f), glm::vec3( 3.29318f, -2.05586f, 9.69561f),
+        glm::vec3( 3.33037f, -2.17894f, 9.69834f), glm::vec3( 3.25794f, -2.17927f, 9.69636f),
+        glm::vec3( 3.21595f, -2.10868f, 9.69014f)
     },
     {
-        glm::vec3(1.13466f, -2.29082f, 8.54121f), glm::vec3(1.15033f, -1.89427f, 8.55291f),
-        glm::vec3(1.14825f, -2.05658f, 8.54913f), glm::vec3(1.20705f, -1.97485f, 8.56584f),
-        glm::vec3(1.22397f, -2.00691f, 8.56430f), glm::vec3(1.09240f, -1.96439f, 8.56793f),
-        glm::vec3(1.07951f, -2.00329f, 8.56696f), glm::vec3(1.14891f, -2.05586f, 8.55016f),
-        glm::vec3(1.18610f, -2.17894f, 8.55290f), glm::vec3(1.11367f, -2.17927f, 8.55091f),
-        glm::vec3(1.07168f, -2.10868f, 8.54469f)
+        glm::vec3( 1.13466f, -2.29082f, 8.54121f), glm::vec3( 1.15033f, -1.89427f, 8.55291f),
+        glm::vec3( 1.14825f, -2.05658f, 8.54913f), glm::vec3( 1.20705f, -1.97485f, 8.56584f),
+        glm::vec3( 1.22397f, -2.00691f, 8.56430f), glm::vec3( 1.09240f, -1.96439f, 8.56793f),
+        glm::vec3( 1.07951f, -2.00329f, 8.56696f), glm::vec3( 1.14891f, -2.05586f, 8.55016f),
+        glm::vec3( 1.18610f, -2.17894f, 8.55290f), glm::vec3( 1.11367f, -2.17927f, 8.55091f),
+        glm::vec3( 1.07168f, -2.10868f, 8.54469f)
     },
     {
         glm::vec3(-0.61301f, -2.29082f, 9.68666f), glm::vec3(-0.59734f, -1.89427f, 9.69836f),
@@ -321,10 +311,8 @@ const PescadorPose PESCADORES[3] = {
 const int TOTAL_PESCADORES = 3;
 
 // ═══════════════════════════════════════════════════════════
-// VELADORAS (3 tipos, cada una con su modelo)
-// Posicion de cada veladora; el modelo se dibuja con su origen en ese punto.
+// VELADORAS
 // ═══════════════════════════════════════════════════════════
-// Opacidad de las veladoras: 1.0 = solidas, 0.0 = invisibles. Prueba entre 0.4 y 0.8.
 const float VELADORA_OPACIDAD = 0.55f;
 
 const glm::vec3 VELADORAS_AZULES[] = {
@@ -344,7 +332,7 @@ const glm::vec3 VELADORAS_AZULES[] = {
     glm::vec3(1.9333f, 0.0720f, 0.8924f)
 };
 
-const glm::vec3 VELADORAS_ROJAS[] = {          // veladora-roja.obj
+const glm::vec3 VELADORAS_ROJAS[] = {
     glm::vec3(-0.0962f, 0.1513f, 0.6829f),
     glm::vec3(0.2375f, 0.0655f, 0.9972f),
     glm::vec3(0.0569f, 0.0655f, 0.6723f),
@@ -368,7 +356,7 @@ const glm::vec3 VELADORAS_ROJAS[] = {          // veladora-roja.obj
     glm::vec3(-0.0962f, 0.1513f, 0.9972f)
 };
 
-const glm::vec3 VELADORAS2_ROJAS[] = {         // veladora2-roja.obj
+const glm::vec3 VELADORAS2_ROJAS[] = {
     glm::vec3(3.9173f, 0.0211f, -1.3924f),
     glm::vec3(3.8521f, 0.0211f, -1.3924f),
     glm::vec3(3.7830f, 0.0211f, -1.3924f),
@@ -438,9 +426,6 @@ const glm::vec3 VELADORAS_AMARILLAS[] = {
 
 // ═══════════════════════════════════════════════════════════
 // FLAMAS
-//   FLAMAS_ANTERIORES: las 73 flamas que ya tenias (no se quita ninguna).
-//   FLAMAS_NUEVAS:     una por cada veladora nueva (96).
-//   Las dos listas se juntan en una sola al iniciar (73 + 96 = 169 flamas).
 // ═══════════════════════════════════════════════════════════
 const glm::vec3 FLAMAS_NUEVAS[] = {
     glm::vec3(-0.0961f, 0.1930f, 0.6831f),
@@ -572,7 +557,6 @@ const glm::vec3 FLAMAS_ANTERIORES[] = {
 std::vector<glm::vec3> posicionesFlamas;
 int totalFlamas = 0;
 
-// Junta las flamas anteriores con las nuevas en una sola lista (la que usa el shader)
 static void construirFlamas()
 {
     posicionesFlamas.assign(std::begin(FLAMAS_ANTERIORES), std::end(FLAMAS_ANTERIORES));
@@ -581,21 +565,13 @@ static void construirFlamas()
 }
 
 // ───────────── Helpers ─────────────
-static void setVec3(GLuint p, const std::string& n, float x, float y, float z)
-{
-    glUniform3f(glGetUniformLocation(p, n.c_str()), x, y, z);
-}
+static void setVec3 (GLuint p, const std::string& n, float x, float y, float z)
+{ glUniform3f(glGetUniformLocation(p, n.c_str()), x, y, z); }
 static void setFloat(GLuint p, const std::string& n, float v)
-{
-    glUniform1f(glGetUniformLocation(p, n.c_str()), v);
-}
+{ glUniform1f(glGetUniformLocation(p, n.c_str()), v); }
 static void setEmission(GLuint p, float r, float g, float b)
-{
-    glUniform3f(glGetUniformLocation(p, "emissive"), r, g, b);
-}
+{ glUniform3f(glGetUniformLocation(p, "emissive"), r, g, b); }
 
-// Inserta saltos de linea para que el texto no se salga de la pantalla.
-// maxWidth esta en unidades de stb_easy_font (antes de aplicar la escala del shader).
 std::string wrapText(const std::string& text, float maxWidth)
 {
     std::istringstream iss(text);
@@ -605,8 +581,7 @@ std::string wrapText(const std::string& text, float maxWidth)
         if (!line.empty() && stb_easy_font_width((char*)test.c_str()) > maxWidth) {
             result += line + "\n";
             line = word;
-        }
-        else {
+        } else {
             line = test;
         }
     }
@@ -619,6 +594,10 @@ std::string wrapText(const std::string& text, float maxWidth)
 // ═══════════════════════════════════════════════════════════
 int main()
 {
+    // ── Limpieza de audio al salir (return normal o Ctrl+C) ──
+    atexit(cleanupAudio);
+    signal(SIGINT, handleSigint);
+
     glfwInit();
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
@@ -648,56 +627,51 @@ int main()
     Shader textShader("Shader/text.vs", "Shader/text.frag");
 
     // Modelos
-    Model cielo((char*)"ModelsProyectos/cielo.obj");
+    Model cielo    ((char*)"ModelsProyectos/cielo.obj");
     Model escenario((char*)"ModelsProyectos/terreno.obj");
-    Model flama((char*)"ModelsProyectos/flama.obj");
-    Model luna((char*)"ModelsProyectos/Moon.obj");
-    Model puerta1((char*)"ModelsProyectos/puerta1.obj");
-    Model puerta2((char*)"ModelsProyectos/puerta2.obj");
-    Model campana((char*)"ModelsProyectos/campana.obj");
-    Model badoja((char*)"ModelsProyectos/badajo.obj");
-    Model lancha((char*)"ModelsProyectos/lancha.obj");
-    Model cabeza((char*)"ModelsProyectos/cabeza.obj");
-    Model torso((char*)"ModelsProyectos/torso.obj");
-    Model hombroIzq((char*)"ModelsProyectos/hombro-izquierdo.obj");
-    Model codoIzq((char*)"ModelsProyectos/codo-izquierdo.obj");
-    Model hombroDer((char*)"ModelsProyectos/hombro-derecho.obj");
-    Model codoDer((char*)"ModelsProyectos/codo-derecho.obj");
-    Model cadera((char*)"ModelsProyectos/cadera.obj");
-    Model piernaIzq((char*)"ModelsProyectos/pierna-izquierda.obj");
-    Model piernaDer((char*)"ModelsProyectos/pierna-derecha.obj");
-    Model redPesc((char*)"ModelsProyectos/red.obj");
+    Model flama    ((char*)"ModelsProyectos/flama.obj");
+    Model luna     ((char*)"ModelsProyectos/Moon.obj");
+    Model puerta1  ((char*)"ModelsProyectos/puerta1.obj");
+    Model puerta2  ((char*)"ModelsProyectos/puerta2.obj");
+    Model campana  ((char*)"ModelsProyectos/campana.obj");
+    Model badoja   ((char*)"ModelsProyectos/badajo.obj");
+    Model lancha     ((char*)"ModelsProyectos/lancha.obj");
+    Model cabeza     ((char*)"ModelsProyectos/cabeza.obj");
+    Model torso      ((char*)"ModelsProyectos/torso.obj");
+    Model hombroIzq  ((char*)"ModelsProyectos/hombro-izquierdo.obj");
+    Model codoIzq    ((char*)"ModelsProyectos/codo-izquierdo.obj");
+    Model hombroDer  ((char*)"ModelsProyectos/hombro-derecho.obj");
+    Model codoDer    ((char*)"ModelsProyectos/codo-derecho.obj");
+    Model cadera     ((char*)"ModelsProyectos/cadera.obj");
+    Model piernaIzq  ((char*)"ModelsProyectos/pierna-izquierda.obj");
+    Model piernaDer  ((char*)"ModelsProyectos/pierna-derecha.obj");
+    Model redPesc    ((char*)"ModelsProyectos/red.obj");
 
-    // Veladoras (3 tipos)
-    Model velAzul((char*)"ModelsProyectos/veladora-azul.obj");
-    Model velRoja((char*)"ModelsProyectos/veladora-roja.obj");
-    Model velRoja2((char*)"ModelsProyectos/veladora2-roja.obj");
-    Model velAmarilla((char*)"ModelsProyectos/veladora-amarilla.obj");
+    Model velAzul     ((char*)"ModelsProyectos/veladora-azul.obj");
+    Model velRoja     ((char*)"ModelsProyectos/veladora-roja.obj");
+    Model velRoja2    ((char*)"ModelsProyectos/veladora2-roja.obj");
+    Model velAmarilla ((char*)"ModelsProyectos/veladora-amarilla.obj");
 
-    // Mariposas (las 3 comparten los mismos 3 modelos)
-    Model mariposaCuerpo((char*)"ModelsProyectos/cuerpo-mariposa.obj");
-    Model mariposaAlaDer((char*)"ModelsProyectos/ala-derecha.obj");
-    Model mariposaAlaIzq((char*)"ModelsProyectos/ala-izquierda.obj");
+    Model mariposaCuerpo ((char*)"ModelsProyectos/cuerpo-mariposa.obj");
+    Model mariposaAlaDer ((char*)"ModelsProyectos/ala-derecha.obj");
+    Model mariposaAlaIzq ((char*)"ModelsProyectos/ala-izquierda.obj");
 
-    // Personaje (camara GTA)
-    Model pjTorso((char*)"ModelsProyectos/torso-ca.obj");
-    Model pjHombroDer((char*)"ModelsProyectos/hombro-derecho-ca.obj");
-    Model pjHombroIzq((char*)"ModelsProyectos/hombro-izquierdo-ca.obj");
-    Model pjCodoDer((char*)"ModelsProyectos/codo-derecho-ca.obj");
-    Model pjCodoIzq((char*)"ModelsProyectos/codo-izquierdo-ca.obj");
-    Model pjPiernaDer((char*)"ModelsProyectos/pierna-derecha-ca.obj");
-    Model pjPiernaIzq((char*)"ModelsProyectos/pierna-izquierda-ca.obj");
-    Model pjRodillaDer((char*)"ModelsProyectos/rodilla-derecha-ca.obj");
-    Model pjRodillaIzq((char*)"ModelsProyectos/rodilla-izquierda-ca.obj");
+    Model pjTorso       ((char*)"ModelsProyectos/torso-ca.obj");
+    Model pjHombroDer   ((char*)"ModelsProyectos/hombro-derecho-ca.obj");
+    Model pjHombroIzq   ((char*)"ModelsProyectos/hombro-izquierdo-ca.obj");
+    Model pjCodoDer     ((char*)"ModelsProyectos/codo-derecho-ca.obj");
+    Model pjCodoIzq     ((char*)"ModelsProyectos/codo-izquierdo-ca.obj");
+    Model pjPiernaDer   ((char*)"ModelsProyectos/pierna-derecha-ca.obj");
+    Model pjPiernaIzq   ((char*)"ModelsProyectos/pierna-izquierda-ca.obj");
+    Model pjRodillaDer  ((char*)"ModelsProyectos/rodilla-derecha-ca.obj");
+    Model pjRodillaIzq  ((char*)"ModelsProyectos/rodilla-izquierda-ca.obj");
 
     lightingShader.Use();
-    glUniform1i(glGetUniformLocation(lightingShader.Program, "material.diffuse"), 0);
+    glUniform1i(glGetUniformLocation(lightingShader.Program, "material.diffuse"),  0);
     glUniform1i(glGetUniformLocation(lightingShader.Program, "material.specular"), 1);
 
-    // Lista final de flamas (nuevas + camino)
     construirFlamas();
 
-    // Aviso: el arreglo flamePos de lighting.frag debe tener espacio para todas las flamas
     {
         GLint nUniforms = 0;
         glGetProgramiv(lightingShader.Program, GL_ACTIVE_UNIFORMS, &nUniforms);
@@ -706,13 +680,12 @@ int main()
             glGetActiveUniform(lightingShader.Program, i, sizeof(name), &len, &size, &type, name);
             if (std::string(name).rfind("flamePos", 0) == 0 && size < totalFlamas) {
                 std::cout << "AVISO: lighting.frag solo tiene espacio para " << size
-                    << " flamas y hay " << totalFlamas
-                    << ". Aumenta el tamano del arreglo flamePos (y el limite del for)." << std::endl;
+                          << " flamas y hay " << totalFlamas
+                          << ". Aumenta el tamano del arreglo flamePos (y el limite del for)." << std::endl;
             }
         }
     }
 
-    // Configuración del Texto UI
     GLuint textVAO, textVBO, textEBO;
     glGenVertexArrays(1, &textVAO);
     glGenBuffers(1, &textVBO);
@@ -721,9 +694,9 @@ int main()
     glBindBuffer(GL_ARRAY_BUFFER, textVBO);
     glBufferData(GL_ARRAY_BUFFER, 99999, NULL, GL_DYNAMIC_DRAW);
     std::vector<unsigned int> indices(9999 * 6);
-    for (int i = 0; i < 9999; i++) {
-        indices[i * 6 + 0] = i * 4 + 0; indices[i * 6 + 1] = i * 4 + 1; indices[i * 6 + 2] = i * 4 + 2;
-        indices[i * 6 + 3] = i * 4 + 2; indices[i * 6 + 4] = i * 4 + 3; indices[i * 6 + 5] = i * 4 + 0;
+    for(int i = 0; i < 9999; i++) {
+        indices[i*6 + 0] = i*4 + 0; indices[i*6 + 1] = i*4 + 1; indices[i*6 + 2] = i*4 + 2;
+        indices[i*6 + 3] = i*4 + 2; indices[i*6 + 4] = i*4 + 3; indices[i*6 + 5] = i*4 + 0;
     }
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, textEBO);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), indices.data(), GL_STATIC_DRAW);
@@ -731,10 +704,8 @@ int main()
     glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 16, (void*)0);
     glBindVertexArray(0);
 
-    // Las 3 mariposas (posicion inicial, aleteo y vuelo)
     std::vector<Mariposas::Mariposa> mariposas = Mariposas::crear();
 
-    // Buffer para calcular las velas más cercanas a la cámara
     const int NUM_FLAME_LIGHTS_CPU = 32;
     std::vector<std::pair<float, int>> flameDists;
     flameDists.reserve(totalFlamas);
@@ -758,14 +729,11 @@ int main()
         if (currentCameraMode == FIRST_PERSON) {
             renderCamPos = playerPos + glm::vec3(0.0f, eyeHeight, 0.0f);
             view = glm::lookAt(renderCamPos, renderCamPos + front, glm::vec3(0.0f, 1.0f, 0.0f));
-        }
-        else if (currentCameraMode == THIRD_PERSON_GTA) {
-            // Camara detras del personaje: el mouse la orbita alrededor de el
+        } else if (currentCameraMode == THIRD_PERSON_GTA) {
             glm::vec3 target = playerPos + glm::vec3(0.0f, GTA_ALTURA_OBJETIVO, 0.0f);
             renderCamPos = posicionCamaraGTA(target, front);
             view = glm::lookAt(renderCamPos, target, glm::vec3(0.0f, 1.0f, 0.0f));
-        }
-        else {
+        } else {
             glm::vec3 target = playerPos + glm::vec3(0.0f, eyeHeight, 0.0f);
             renderCamPos = target - front * 3.0f + glm::vec3(0.0f, 0.5f, 0.0f);
             view = glm::lookAt(renderCamPos, target, glm::vec3(0.0f, 1.0f, 0.0f));
@@ -779,28 +747,25 @@ int main()
 
         setVec3(prog, "viewPos", renderCamPos.x, renderCamPos.y, renderCamPos.z);
 
-        // Luces
-        setVec3(prog, "dirLight.direction", -0.2f, -1.0f, -0.3f);
-        setVec3(prog, "dirLight.ambient", 0.10f * LUZ_ESCENARIO, 0.15f * LUZ_ESCENARIO, 0.25f * LUZ_ESCENARIO);
-        setVec3(prog, "dirLight.diffuse", 0.30f * LUZ_ESCENARIO, 0.35f * LUZ_ESCENARIO, 0.55f * LUZ_ESCENARIO);
-        setVec3(prog, "dirLight.specular", 0.20f * LUZ_ESCENARIO, 0.25f * LUZ_ESCENARIO, 0.35f * LUZ_ESCENARIO);
+        setVec3 (prog, "dirLight.direction", -0.2f, -1.0f, -0.3f);
+        setVec3 (prog, "dirLight.ambient",    0.10f * LUZ_ESCENARIO, 0.15f * LUZ_ESCENARIO, 0.25f * LUZ_ESCENARIO);
+        setVec3 (prog, "dirLight.diffuse",    0.30f * LUZ_ESCENARIO, 0.35f * LUZ_ESCENARIO, 0.55f * LUZ_ESCENARIO);
+        setVec3 (prog, "dirLight.specular",   0.20f * LUZ_ESCENARIO, 0.25f * LUZ_ESCENARIO, 0.35f * LUZ_ESCENARIO);
 
-        glm::vec3 lunaPos(-10.0f, 5.0f, -12.0f);
-        glm::vec3 lunaTarget(2.0f, 0.0f, 0.0f);
+        glm::vec3 lunaPos   (-10.0f, 5.0f, -12.0f);
+        glm::vec3 lunaTarget(  2.0f, 0.0f,   0.0f);
         glm::vec3 lunaDir = glm::normalize(lunaTarget - lunaPos);
-        setVec3(prog, "spotLight.position", lunaPos.x, lunaPos.y, lunaPos.z);
-        setVec3(prog, "spotLight.direction", lunaDir.x, lunaDir.y, lunaDir.z);
-        setFloat(prog, "spotLight.cutOff", glm::cos(glm::radians(30.0f)));
+        setVec3 (prog, "spotLight.position",    lunaPos.x, lunaPos.y, lunaPos.z);
+        setVec3 (prog, "spotLight.direction",   lunaDir.x, lunaDir.y, lunaDir.z);
+        setFloat(prog, "spotLight.cutOff",      glm::cos(glm::radians(30.0f)));
         setFloat(prog, "spotLight.outerCutOff", glm::cos(glm::radians(45.0f)));
-        setFloat(prog, "spotLight.constant", 1.0f);
-        setFloat(prog, "spotLight.linear", 0.005f);
-        setFloat(prog, "spotLight.quadratic", 0.0005f);
-        setVec3(prog, "spotLight.ambient", 0.08f * LUZ_ESCENARIO, 0.10f * LUZ_ESCENARIO, 0.18f * LUZ_ESCENARIO);
-        setVec3(prog, "spotLight.diffuse", 0.80f * LUZ_ESCENARIO, 0.90f * LUZ_ESCENARIO, 1.10f * LUZ_ESCENARIO);
-        setVec3(prog, "spotLight.specular", 0.30f * LUZ_ESCENARIO, 0.40f * LUZ_ESCENARIO, 0.60f * LUZ_ESCENARIO);
+        setFloat(prog, "spotLight.constant",    1.0f);
+        setFloat(prog, "spotLight.linear",      0.005f);
+        setFloat(prog, "spotLight.quadratic",   0.0005f);
+        setVec3 (prog, "spotLight.ambient",     0.08f * LUZ_ESCENARIO, 0.10f * LUZ_ESCENARIO, 0.18f * LUZ_ESCENARIO);
+        setVec3 (prog, "spotLight.diffuse",     0.80f * LUZ_ESCENARIO, 0.90f * LUZ_ESCENARIO, 1.10f * LUZ_ESCENARIO);
+        setVec3 (prog, "spotLight.specular",    0.30f * LUZ_ESCENARIO, 0.40f * LUZ_ESCENARIO, 0.60f * LUZ_ESCENARIO);
 
-        // ── LUCES DE LAS VELAS: TODAS ENCENDIDAS ──
-                // ── Buscar las 32 velas más cercanas a la cámara (una vez por frame) ──
         flameDists.clear();
         for (int i = 0; i < totalFlamas; ++i) {
             glm::vec3 d = renderCamPos - posicionesFlamas[i];
@@ -820,27 +785,26 @@ int main()
         setFloat(prog, "material.shininess", 32.0f);
 
         glm::mat4 projection = glm::perspective(camera.GetZoom(), (GLfloat)SCREEN_WIDTH / (GLfloat)SCREEN_HEIGHT, 0.1f, 500.0f);
-        glUniformMatrix4fv(glGetUniformLocation(prog, "view"), 1, GL_FALSE, glm::value_ptr(view));
+        glUniformMatrix4fv(glGetUniformLocation(prog, "view"),       1, GL_FALSE, glm::value_ptr(view));
         glUniformMatrix4fv(glGetUniformLocation(prog, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
 
         GLint modelLoc = glGetUniformLocation(prog, "model");
         GLint transLoc = glGetUniformLocation(prog, "transparency");
 
-        // Iluminación del piso uniforme
         setVec3(prog, "floorGlow", 0.12f * LUZ_PISO, 0.05f * LUZ_PISO, 0.02f * LUZ_PISO);
 
-        // ══════ CIELO NOCTURNO ══════
-        glDisable(GL_DEPTH_TEST); // Apagamos profundidad para que quede al fondo
-        setEmission(prog, BRILLO_CIELO, BRILLO_CIELO, BRILLO_CIELO); // Brillo del cielo (no le afectan las velas)
+        // CIELO NOCTURNO
+        glDisable(GL_DEPTH_TEST);
+        setEmission(prog, BRILLO_CIELO, BRILLO_CIELO, BRILLO_CIELO);
         glUniform1i(transLoc, 0);
 
         glm::mat4 modelCielo = glm::mat4(1.0f);
-        modelCielo = glm::translate(modelCielo, renderCamPos); // Sigue a la cámara
-        modelCielo = glm::scale(modelCielo, glm::vec3(20.0f)); // Escala gigante
+        modelCielo = glm::translate(modelCielo, renderCamPos);
+        modelCielo = glm::scale(modelCielo, glm::vec3(20.0f));
         glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(modelCielo));
         cielo.Draw(lightingShader);
 
-        glEnable(GL_DEPTH_TEST); // Encendemos profundidad de nuevo para el cementerio
+        glEnable(GL_DEPTH_TEST);
 
         // ESCENARIO
         setEmission(prog, 0.0f, 0.0f, 0.0f);
@@ -851,12 +815,12 @@ int main()
         glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
         escenario.Draw(lightingShader);
 
-        // ══════ FLAMAS ══════
+        // FLAMAS
         setEmission(prog, 0.85f, 0.40f, 0.10f);
         for (int i = 0; i < totalFlamas; ++i) {
             float t = now + i * 0.35f;
             float pulso = std::sin(t * 5.1f) * 0.15f + std::sin(t * 7.7f) * 0.08f + std::sin(t * 12.3f) * 0.03f;
-            float escalaY = 1.0f + pulso;
+            float escalaY  = 1.0f + pulso;
             float escalaXZ = 1.0f - pulso * 0.3f;
             float tiltX = std::sin(t * 3.3f) * 0.25f + std::sin(t * 5.9f) * 0.10f;
             float tiltZ = std::cos(t * 3.1f) * 0.20f + std::cos(t * 6.7f) * 0.08f;
@@ -865,17 +829,17 @@ int main()
             mLlama = glm::translate(mLlama, posicionesFlamas[i]);
             mLlama = glm::rotate(mLlama, tiltX, glm::vec3(1, 0, 0));
             mLlama = glm::rotate(mLlama, tiltZ, glm::vec3(0, 0, 1));
-            mLlama = glm::scale(mLlama, glm::vec3(escalaXZ, escalaY, escalaXZ));
+            mLlama = glm::scale  (mLlama, glm::vec3(escalaXZ, escalaY, escalaXZ));
             glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(mLlama));
             flama.Draw(lightingShader);
         }
 
         // LUNA
-        setEmission(prog, 0.0f, 0.0f, 0.0f);;
+        setEmission(prog, 0.0f, 0.0f, 0.0f);
         glUniform1i(transLoc, 0);
         model = glm::mat4(1.0f);
         model = glm::translate(model, glm::vec3(-10.0f, 18.0f, -20.0f));
-        model = glm::scale(model, glm::vec3(0.6f));
+        model = glm::scale    (model, glm::vec3(0.6f));
         glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
         luna.Draw(lightingShader);
 
@@ -902,20 +866,20 @@ int main()
                     else break;
                 }
                 float localT = t - lastToll;
-                float env = std::exp(-1.3f * localT);
-                bellAngle = 0.35f * std::sin(2.2f * localT) * env;
+                float env    = std::exp(-1.3f * localT);
+                bellAngle    = 0.35f * std::sin(2.2f * localT) * env;
                 clapperAngle = bellAngle + 0.08f * std::sin(6.5f * localT) * env;
             }
         }
         model = glm::mat4(1.0f);
         model = glm::translate(model, BELL_PIVOT);
-        model = glm::rotate(model, bellAngle, glm::vec3(0.0f, 0.0f, 1.0f));
+        model = glm::rotate   (model, bellAngle, glm::vec3(0.0f, 0.0f, 1.0f));
         model = glm::translate(model, BELL_POSITION - BELL_PIVOT);
         glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
         campana.Draw(lightingShader);
         model = glm::mat4(1.0f);
         model = glm::translate(model, BELL_PIVOT);
-        model = glm::rotate(model, clapperAngle, glm::vec3(0.0f, 0.0f, 1.0f));
+        model = glm::rotate   (model, clapperAngle, glm::vec3(0.0f, 0.0f, 1.0f));
         model = glm::translate(model, CLAPPER_POSITION - BELL_PIVOT);
         glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
         badoja.Draw(lightingShader);
@@ -926,11 +890,9 @@ int main()
             &hombroDer, &codoDer, &piernaIzq, &piernaDer, &redPesc
         };
 
-        // Los 3 pescadores comparten la misma coreografia: sin retraso (delay)
-        // ni desfase del oleaje (phase). La pose se calcula una sola vez por frame.
         const float delay = 0.0f;
         const float phase = 0.0f;
-        Danza::Pose pose = Danza::evaluate(now, delay, phase);
+        Danza::Pose pose    = Danza::evaluate(now, delay, phase);
         Danza::Pose lagPose = Danza::evaluate(now - 0.05f, delay, phase);
 
         for (int i = 0; i < TOTAL_PESCADORES; ++i) {
@@ -951,10 +913,7 @@ int main()
             }
         }
 
-        // ══════ MARIPOSAS ══════
-        // transparency = 1 respeta la transparencia de la textura de las alas
-        // (si se ven raras o semitransparentes, cambialo a 0).
-        // El emissive da un leve brillo para que no se pierdan en la noche.
+        // MARIPOSAS
         setEmission(prog, 0.12f, 0.08f, 0.04f);
         glUniform1i(transLoc, 1);
         for (Mariposas::Mariposa& m : mariposas) {
@@ -970,9 +929,8 @@ int main()
         }
         setEmission(prog, 0.0f, 0.0f, 0.0f);
 
-        // ══════ PERSONAJE (solo con la camara GTA) ══════
+        // PERSONAJE (solo con la camara GTA)
         if (currentCameraMode == THIRD_PERSON_GTA) {
-            // emissive: leve brillo para que se vea de noche
             setEmission(prog, 0.05f, 0.045f, 0.04f);
             glUniform1i(transLoc, 0);
 
@@ -992,10 +950,7 @@ int main()
             setEmission(prog, 0.0f, 0.0f, 0.0f);
         }
 
-        // ══════ VELADORAS (translucidas) ══════
-        // Se dibujan al final, despues de todo lo opaco y sin escribir profundidad,
-        // para que se vea a traves de ellas lo que hay detras.
-        // La opacidad es fija (VELADORA_OPACIDAD) y no depende del shader.
+        // VELADORAS (translucidas)
         setEmission(prog, 0.0f, 0.0f, 0.0f);
         glUniform1i(transLoc, 1);
         glEnable(GL_BLEND);
@@ -1003,45 +958,43 @@ int main()
         glBlendFunc(GL_CONSTANT_ALPHA, GL_ONE_MINUS_CONSTANT_ALPHA);
         glDepthMask(GL_FALSE);
 
-        // Cada tipo usa su propio modelo, dibujado en cada una de sus posiciones.
         auto dibujarVeladoras = [&](Model& m, const glm::vec3* posiciones, int cantidad) {
             for (int i = 0; i < cantidad; ++i) {
                 glm::mat4 mv = glm::translate(glm::mat4(1.0f), posiciones[i]);
                 glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(mv));
                 m.Draw(lightingShader);
             }
-            };
-        dibujarVeladoras(velAzul, VELADORAS_AZULES, (int)(sizeof(VELADORAS_AZULES) / sizeof(glm::vec3)));
-        dibujarVeladoras(velRoja, VELADORAS_ROJAS, (int)(sizeof(VELADORAS_ROJAS) / sizeof(glm::vec3)));
-        dibujarVeladoras(velRoja2, VELADORAS2_ROJAS, (int)(sizeof(VELADORAS2_ROJAS) / sizeof(glm::vec3)));
+        };
+        dibujarVeladoras(velAzul,     VELADORAS_AZULES,    (int)(sizeof(VELADORAS_AZULES)    / sizeof(glm::vec3)));
+        dibujarVeladoras(velRoja,     VELADORAS_ROJAS,     (int)(sizeof(VELADORAS_ROJAS)     / sizeof(glm::vec3)));
+        dibujarVeladoras(velRoja2,    VELADORAS2_ROJAS,    (int)(sizeof(VELADORAS2_ROJAS)    / sizeof(glm::vec3)));
         dibujarVeladoras(velAmarilla, VELADORAS_AMARILLAS, (int)(sizeof(VELADORAS_AMARILLAS) / sizeof(glm::vec3)));
 
         glDepthMask(GL_TRUE);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-        // DIBUJAR TEXTO (UI)
+        // TEXTO UI
         if (mensajeTimer > 0.0f) {
             mensajeTimer -= deltaTime;
-
+            
             glm::mat4 textProj = glm::ortho(0.0f, (float)SCREEN_WIDTH, (float)SCREEN_HEIGHT, 0.0f, -1.0f, 1.0f);
             textShader.Use();
             glUniformMatrix4fv(glGetUniformLocation(textShader.Program, "projection"), 1, GL_FALSE, glm::value_ptr(textProj));
             glUniform2f(glGetUniformLocation(textShader.Program, "scale"), 3.0f, 3.0f);
-            // Texto en color blanco
             glUniform3f(glGetUniformLocation(textShader.Program, "textColor"), 1.0f, 1.0f, 1.0f);
-
+            
             glDisable(GL_DEPTH_TEST);
             glEnable(GL_BLEND);
             glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-            static char buffer[99999];
+            static char buffer[99999]; 
             int num_quads = stb_easy_font_print(20.0f, 20.0f, (char*)mensajeActivo.c_str(), NULL, buffer, sizeof(buffer));
 
             glBindVertexArray(textVAO);
             glBindBuffer(GL_ARRAY_BUFFER, textVBO);
             glBufferSubData(GL_ARRAY_BUFFER, 0, num_quads * 4 * 16, buffer);
             glDrawElements(GL_TRIANGLES, num_quads * 6, GL_UNSIGNED_INT, 0);
-
+            
             glBindVertexArray(0);
             glDisable(GL_BLEND);
             glEnable(GL_DEPTH_TEST);
@@ -1052,6 +1005,10 @@ int main()
     }
 
     glfwTerminate();
+
+    // Detener cualquier afplay que se haya quedado vivo
+    cleanupAudio();
+
     return 0;
 }
 
@@ -1061,9 +1018,6 @@ void DoMovement()
     float velocity = 2.5f * deltaTime;
     glm::vec3 f = camera.GetFront();
 
-    // ── TERCERA PERSONA LIBRE: vuelo sin suelo ni colisiones ──
-    // W/S avanzan hacia donde mira la camara (incluye subir/bajar con el mouse),
-    // A/D se desplazan de lado, ESPACIO sube y SHIFT baja.
     if (currentCameraMode == THIRD_PERSON_FREE) {
         float vel = 3.0f * deltaTime;
         glm::vec3 fwd = glm::normalize(f);
@@ -1078,9 +1032,6 @@ void DoMovement()
         return;
     }
 
-    // ── CAMARA GTA: el personaje camina hacia donde apunta la camara ──
-    // W avanza, S retrocede, A/D se mueven de lado (siempre respecto a la camara);
-    // el personaje gira suavemente hacia donde camina y mueve brazos y piernas.
     if (currentCameraMode == THIRD_PERSON_GTA) {
         glm::vec3 fwd = glm::normalize(glm::vec3(f.x, 0.0f, f.z));
         glm::vec3 rgt = glm::normalize(glm::cross(fwd, glm::vec3(0.0f, 1.0f, 0.0f)));
@@ -1097,20 +1048,17 @@ void DoMovement()
             dir = glm::normalize(dir);
             glm::vec3 move = dir * Personaje::VEL_CAMINAR * deltaTime;
 
-            // Pasos pequenos para no atravesar paredes
             int steps = std::max(1, (int)std::ceil(glm::length(move) / 0.02f));
             for (int i = 0; i < steps; ++i) {
                 playerPos += move / (float)steps;
                 resolveWallCollisions(playerPos, PERSONAJE_RADIO);
             }
 
-            // El personaje mira hacia donde camina
             Personaje::girarHacia(personaje, std::atan2(-dir.z, dir.x), deltaTime);
         }
 
         playerPos.y = getFloorHeight(playerPos.x, playerPos.z);
 
-        // La caminata avanza segun la distancia que realmente recorrio
         float recorrido = glm::length(glm::vec2(playerPos.x - antes.x, playerPos.z - antes.z));
         Personaje::avanzarAnimacion(personaje, recorrido, deltaTime);
         return;
@@ -1125,7 +1073,6 @@ void DoMovement()
     if (keys[GLFW_KEY_A] || keys[GLFW_KEY_LEFT])  move -= right * velocity;
     if (keys[GLFW_KEY_D] || keys[GLFW_KEY_RIGHT]) move += right * velocity;
 
-    // Se avanza en pasos pequenos para no atravesar paredes aunque bajen los FPS
     int steps = std::max(1, (int)std::ceil(glm::length(move) / 0.05f));
     for (int i = 0; i < steps; ++i) {
         playerPos += move / (float)steps;
@@ -1150,69 +1097,66 @@ void KeyCallback(GLFWwindow* w, int key, int, int action, int)
         currentCameraMode = (CameraMode)((currentCameraMode + 1) % TOTAL_CAMERA_MODES);
 
         if (currentCameraMode == THIRD_PERSON_GTA) {
-            // El personaje aparece donde lo pusiste en Blender, mirando hacia +X
             playerPos = Personaje::INICIO;
             personaje = Personaje::Estado();
             camera.SetPitchLimits(GTA_PITCH_MIN, GTA_PITCH_MAX);
             camera.SetYaw(0.0f);
             camera.SetPitch(GTA_PITCH_INICIAL);
             std::cout << "Camara: Tercera Persona estilo GTA." << std::endl;
-        }
-        else {
-            // Los demas modos usan el rango normal de inclinacion
+        } else {
             camera.SetPitchLimits(-89.0f, 89.0f);
 
             if (currentCameraMode == THIRD_PERSON_FREE) {
                 playerPos = STAIRS_START;
-                camera.SetYaw(0.0f);
+                camera.SetYaw(0.0f); 
                 std::cout << "Camara: Tercera Persona Libre." << std::endl;
-            }
-            else if (currentCameraMode == THIRD_PERSON_RESTRICTED) {
+            } else if (currentCameraMode == THIRD_PERSON_RESTRICTED) {
                 std::cout << "Camara: Tercera Persona Restringida." << std::endl;
-            }
-            else {
-                playerPos = STAIRS_START;   // al salir del modo libre se regresa al punto de inicio
+            } else {
+                playerPos = STAIRS_START;
                 std::cout << "Camara: Primera Persona" << std::endl;
             }
         }
     }
 
     if (key == GLFW_KEY_E && action == GLFW_PRESS) {
+        // Si la campana ya esta sonando, ignorar la tecla
+        if (bellSwingActive) {
+            std::cout << "La campana ya esta sonando..." << std::endl;
+            return;
+        }
+
         glm::vec3 playerHead = playerPos + glm::vec3(0.0f, eyeHeight, 0.0f);
         if (glm::length(playerHead - BELL_POSITION) < BELL_NEAR_DISTANCE) {
-            bellSwingActive = true;
+            bellSwingActive    = true;
             bellSwingStartTime = (float)glfwGetTime();
             playSound("Sounds/campana.wav");
         }
     }
 
-    // Depuracion: imprime la posicion actual del jugador para calibrar tumbas
     if (key == GLFW_KEY_P && action == GLFW_PRESS) {
         std::cout << "playerPos: " << playerPos.x << ", "
-            << playerPos.y << ", " << playerPos.z << std::endl;
+                  << playerPos.y << ", " << playerPos.z << std::endl;
     }
 
     if (action == GLFW_PRESS) {
-        int teclasTumbas[10] = { GLFW_KEY_1, GLFW_KEY_2, GLFW_KEY_3, GLFW_KEY_4, GLFW_KEY_5,
+        int teclasTumbas[10] = { GLFW_KEY_1, GLFW_KEY_2, GLFW_KEY_3, GLFW_KEY_4, GLFW_KEY_5, 
                                  GLFW_KEY_6, GLFW_KEY_7, GLFW_KEY_8, GLFW_KEY_9, GLFW_KEY_0 };
-
+        
         for (int i = 0; i < 10; ++i) {
             if (key == teclasTumbas[i]) {
-                // Distancia HORIZONTAL (X y Z) para evitar problemas de altura
                 glm::vec2 playerXZ(playerPos.x, playerPos.z);
                 glm::vec2 tumbaXZ(TUMBAS[i].posicion.x, TUMBAS[i].posicion.z);
-
+                
                 float dist = glm::length(playerXZ - tumbaXZ);
-
+                
                 if (dist < DISTANCIA_TUMBA) {
-                    // Salto de linea automatico: 120 px de margen, y se divide entre 3 por la escala del shader
                     mensajeActivo = wrapText(TUMBAS[i].dato, (SCREEN_WIDTH - 120) / 3.0f);
                     mensajeTimer = 10.0f;
-                }
-                else {
-                    std::cout << "Muy lejos de la Tumba " << (i + 1)
-                        << ". Distancia actual: " << dist
-                        << " (Necesitas estar a menos de " << DISTANCIA_TUMBA << ")" << std::endl;
+                } else {
+                    std::cout << "Muy lejos de la Tumba " << (i+1) 
+                              << ". Distancia actual: " << dist 
+                              << " (Necesitas estar a menos de " << DISTANCIA_TUMBA << ")" << std::endl;
                 }
             }
         }
