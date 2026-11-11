@@ -33,35 +33,81 @@
 #include "Mariposas.h"
 #include "Personaje.h"
 
+// ───────────── Includes de audio por plataforma ─────────────
+#ifdef _WIN32
+    #ifndef NOMINMAX
+        #define NOMINMAX
+    #endif
+    #define WIN32_LEAN_AND_MEAN
+    #include <windows.h>
+    #include <mmsystem.h>
+    #ifdef _MSC_VER
+        #pragma comment(lib, "winmm.lib")   // con MinGW agrega -lwinmm al enlazar
+    #endif
+#else
+    #include <unistd.h>
+    #include <fcntl.h>
+    #include <spawn.h>
+    extern char** environ;
+#endif
+
 // ───────────── Callbacks ─────────────
 void KeyCallback(GLFWwindow*, int, int, int, int);
 void MouseCallback(GLFWwindow*, double, double);
 void DoMovement();
 
-void playSound(const std::string& filename) {
+// ───────────── Audio ─────────────
+// Windows : PlaySound (API nativa, asincrona, muere junto con el proceso).
+// macOS/Linux: se lanza afplay/aplay con posix_spawnp (no bloquea el render)
+//              y se guarda su PID para poder matarlo al salir.
+#ifndef _WIN32
+static volatile pid_t audioPid = -1;
+#endif
+
+void stopSound() {
 #ifdef _WIN32
-    std::thread([filename]() {
-        std::string cmd = "powershell -c (New-Object Media.SoundPlayer '" + filename + "').PlaySync();";
-        std::system(cmd.c_str());
-    }).detach();
-#elif __APPLE__
-    std::string cmd = "afplay " + filename + " > /dev/null 2>&1 &";
-    std::system(cmd.c_str());
+    PlaySoundA(NULL, NULL, 0);
 #else
-    std::string cmd = "aplay " + filename + " > /dev/null 2>&1 &";
-    std::system(cmd.c_str());
+    pid_t p = audioPid;
+    if (p > 0) {
+        kill(p, SIGTERM);
+        audioPid = -1;
+    }
+#endif
+}
+
+void playSound(const std::string& filename) {
+    stopSound();   // por si quedara un sonido anterior
+#ifdef _WIN32
+    PlaySoundA(filename.c_str(), NULL, SND_FILENAME | SND_ASYNC);
+#else
+#ifdef __APPLE__
+    const char* player = "afplay";
+#else
+    const char* player = "aplay";
+#endif
+    posix_spawn_file_actions_t fa;
+    posix_spawn_file_actions_init(&fa);
+    posix_spawn_file_actions_addopen(&fa, 1, "/dev/null", O_WRONLY, 0);
+    posix_spawn_file_actions_adddup2(&fa, 1, 2);
+
+    char* argv[] = { (char*)player, (char*)filename.c_str(), nullptr };
+    pid_t pid = -1;
+    if (posix_spawnp(&pid, player, &fa, nullptr, argv, environ) == 0)
+        audioPid = pid;
+    else
+        std::cout << "No se pudo lanzar " << player << std::endl;
+    posix_spawn_file_actions_destroy(&fa);
 #endif
 }
 
 void cleanupAudio() {
-#ifdef __APPLE__
-    std::system("pkill -f 'afplay.*campana' 2>/dev/null");
-    std::system("pkill -f 'afplay.*janitzio' 2>/dev/null");
-#endif
+    stopSound();
 }
 
 extern "C" void handleSigint(int) {
-    exit(0);   
+    stopSound();
+    std::_Exit(0);
 }
 
 // ───────────── Configuración ─────────────
@@ -231,6 +277,18 @@ const float BELL_TOLL_TIMES[] = { 0.0f, 2.7f, 4.8f, 8.5f, 11.5f, 14.0f };
 const int   BELL_TOLL_COUNT   = 6;
 bool  bellSwingActive    = false;
 float bellSwingStartTime = 0.0f;
+
+// Retraso (en segundos) entre lanzar playSound() y que el sonido realmente
+// se escuche. La animacion espera este tiempo antes de arrancar.
+// AJUSTAR A OJO: si la animacion va ADELANTADA al audio, SUBE el valor;
+// si va ATRASADA, BAJALO.
+#ifdef _WIN32
+const float AUDIO_LATENCIA = 0.05f;   // PlaySound (nativo)
+#elif __APPLE__
+const float AUDIO_LATENCIA = 0.12f;   // afplay tiene que abrir y decodificar
+#else
+const float AUDIO_LATENCIA = 0.08f;   // aplay
+#endif
 
 // ═══════════════════════════════════════════════════════════
 // TUMBAS INTERACTIVAS
@@ -598,7 +656,8 @@ std::string wrapText(const std::string& text, float maxWidth)
 int main()
 {
     atexit(cleanupAudio);
-    signal(SIGINT, handleSigint);
+    signal(SIGINT,  handleSigint);
+    signal(SIGTERM, handleSigint);
 
     glfwInit();
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
@@ -878,17 +937,25 @@ int main()
         float bellAngle = 0.0f, clapperAngle = 0.0f;
         if (bellSwingActive) {
             float t = now - bellSwingStartTime;
-            if (t > BELL_SWING_DURATION) bellSwingActive = false;
-            else {
-                float lastToll = BELL_TOLL_TIMES[0];
-                for (int i = 0; i < BELL_TOLL_COUNT; ++i) {
-                    if (t >= BELL_TOLL_TIMES[i]) lastToll = BELL_TOLL_TIMES[i];
-                    else break;
+
+            // CAMBIO: mientras t < 0 estamos esperando a que el audio realmente
+            // empiece a sonar (AUDIO_LATENCIA). La campana se queda quieta.
+            // Antes, un t negativo hacia que exp(-1.3*localT) creciera y la
+            // campana se sacudiera de forma incorrecta.
+            if (t >= 0.0f) {
+                if (t > BELL_SWING_DURATION) {
+                    bellSwingActive = false;
+                } else {
+                    float lastToll = BELL_TOLL_TIMES[0];
+                    for (int i = 0; i < BELL_TOLL_COUNT; ++i) {
+                        if (t >= BELL_TOLL_TIMES[i]) lastToll = BELL_TOLL_TIMES[i];
+                        else break;
+                    }
+                    float localT = t - lastToll;
+                    float env    = std::exp(-1.3f * localT);
+                    bellAngle    = 0.35f * std::sin(2.2f * localT) * env;
+                    clapperAngle = bellAngle + 0.08f * std::sin(6.5f * localT) * env;
                 }
-                float localT = t - lastToll;
-                float env    = std::exp(-1.3f * localT);
-                bellAngle    = 0.35f * std::sin(2.2f * localT) * env;
-                clapperAngle = bellAngle + 0.08f * std::sin(6.5f * localT) * env;
             }
         }
         model = glm::mat4(1.0f);
@@ -1108,6 +1175,14 @@ void DoMovement()
 
 void KeyCallback(GLFWwindow* w, int key, int, int action, int)
 {
+    // CAMBIO: el registro de keys[] va PRIMERO. Antes estaba al final y el
+    // 'return' de la campana (cuando ya estaba sonando) lo saltaba, dejando
+    // teclas "atoradas" si se soltaban mientras sonaba la campana.
+    if (key >= 0 && key < 1024) {
+        if (action == GLFW_PRESS)        keys[key] = true;
+        else if (action == GLFW_RELEASE) keys[key] = false;
+    }
+
     if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
         glfwSetWindowShouldClose(w, GL_TRUE);
     }
@@ -1139,17 +1214,19 @@ void KeyCallback(GLFWwindow* w, int key, int, int action, int)
     }
 
     if (key == GLFW_KEY_E && action == GLFW_PRESS) {
-        // Si la campana ya esta sonando, ignorar la tecla
         if (bellSwingActive) {
+            // Si la campana ya esta sonando, ignorar la tecla
             std::cout << "La campana ya esta sonando..." << std::endl;
-            return;
-        }
-
-        glm::vec3 playerHead = playerPos + glm::vec3(0.0f, eyeHeight, 0.0f);
-        if (glm::length(playerHead - BELL_POSITION) < BELL_NEAR_DISTANCE) {
-            bellSwingActive    = true;
-            bellSwingStartTime = (float)glfwGetTime();
-            playSound("Sounds/campana.wav");
+        } else {
+            glm::vec3 playerHead = playerPos + glm::vec3(0.0f, eyeHeight, 0.0f);
+            if (glm::length(playerHead - BELL_POSITION) < BELL_NEAR_DISTANCE) {
+                // CAMBIO: se lanza el audio (ahora en un hilo, sin bloquear) y la
+                // animacion arranca AUDIO_LATENCIA segundos despues, que es lo que
+                // tarda el sonido en empezar a escucharse realmente.
+                playSound("Sounds/campana.wav");
+                bellSwingActive    = true;
+                bellSwingStartTime = (float)glfwGetTime() + AUDIO_LATENCIA;
+            }
         }
     }
 
@@ -1179,11 +1256,6 @@ void KeyCallback(GLFWwindow* w, int key, int, int action, int)
                 }
             }
         }
-    }
-
-    if (key >= 0 && key < 1024) {
-        if (action == GLFW_PRESS)        keys[key] = true;
-        else if (action == GLFW_RELEASE) keys[key] = false;
     }
 }
 
