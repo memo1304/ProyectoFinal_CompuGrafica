@@ -1,22 +1,5 @@
 #pragma once
-// ============================================================================
-//  DanzaPescadores.h  -  VERSION POR KEYFRAMES
-//  Animacion jerarquica (cinematica directa) para la Danza de los Pescadores.
-//
-//  Cada seccion del baile es una TABLA DE KEYFRAMES: una lista de poses
-//  (beat + valor de cada articulacion). El programa solo interpola entre
-//  una pose y la siguiente. No hay formulas de baile: las poses estan
-//  definidas a mano en las tablas de abajo.
-//
-//  Jerarquia:
-//    lancha (raiz: oleaje)
-//      └─ cadera (giro del cuerpo, balanceo, flexion de rodillas)
-//           ├─ piernaIzq / piernaDer
-//           └─ torso (inclinacion, torsion)
-//                ├─ cabeza
-//                ├─ hombroIzq ─ codoIzq
-//                └─ hombroDer ─ codoDer ─ red (pendulo)
-// ============================================================================
+
 #include <cmath>
 #include <algorithm>
 #include <vector>
@@ -27,27 +10,27 @@
 
 namespace Danza {
 
-// ───────────── Parametros musicales ─────────────
+// parametros musicales
 constexpr float PI                = 3.14159265f;
-constexpr float BPM               = 100.0f;   // 1 beat = 0.6 s
+constexpr float BPM               = 100.0f;
 constexpr float BEATS_PER_SECTION = 8.0f;
-constexpr int   NUM_SECTIONS      = 8;        // 8 secciones en total
-constexpr float BLEND_BEATS       = 1.0f;     // transicion suave entre secciones
+constexpr int   NUM_SECTIONS      = 8;
+constexpr float BLEND_BEATS       = 1.0f;
 
-// ───────────── Offsets de pivotes ─────────────
-const glm::vec3 WAIST_OFFSET(0.0f, -0.05f, 0.0f);    // cintura respecto a cadera
-const glm::vec3 NET_PIVOT_OFFSET(0.0f, 0.05f, 0.0f); // mano respecto al centro de la red
+// offsets de pivotes
+const glm::vec3 WAIST_OFFSET(0.0f, -0.05f, 0.0f);
+const glm::vec3 NET_PIVOT_OFFSET(0.0f, 0.05f, 0.0f);
 
-constexpr float LEG_GAIN = 0.45f; // Intensidad del movimiento de piernas
-constexpr float FWD = -1.0f;      // Hacia donde miran los modelos: -1 = hacia -Z
+constexpr float LEG_GAIN = 0.45f;
+constexpr float FWD = -1.0f;
 
-// Dimensiones aproximadas de la lancha
+// medidas de la lancha
 constexpr float BOAT_HALF_LEN  = 0.8f;
 constexpr float BOAT_HALF_WID  = 0.2f;
 constexpr float BOAT_BOB_AMP   = 0.02f;
 constexpr float BOAT_REST_LIFT = 0.0f;
 
-// ───────────── Canales de animacion ─────────────
+// canales de animacion
 enum Ch {
     BOB_Y, BOAT_ROLL, BOAT_PITCH,
     BODY_YAW, HIP_ROLL, HIP_DROP,
@@ -60,7 +43,7 @@ enum Ch {
     NUM_CH
 };
 
-// Una pose = un valor por articulacion (lo que no se escribe vale 0)
+// una pose: un valor por articulacion
 struct Pose {
     float c[NUM_CH];
     Pose() { for (int i = 0; i < NUM_CH; ++i) c[i] = 0.0f; }
@@ -68,7 +51,7 @@ struct Pose {
     const float& operator[](int i) const { return c[i]; }
 };
 
-// ───────────── Utilidades ─────────────
+// utilidades
 inline float clamp01(float x) { return std::min(1.0f, std::max(0.0f, x)); }
 inline float smooth(float x)  { x = clamp01(x); return x * x * (3.0f - 2.0f * x); }
 inline float wrapPi(float a)  { while (a > PI) a -= 2*PI; while (a < -PI) a += 2*PI; return a; }
@@ -79,19 +62,19 @@ inline Pose lerpPose(const Pose& a, const Pose& b, float k) {
     return r;
 }
 
-// Mezcla entre secciones (el yaw se envuelve para no dar vueltas de mas)
+// mezcla entre secciones, el yaw se envuelve para no dar vueltas de mas
 inline Pose mix(const Pose& a, const Pose& b, float k) {
     Pose r = lerpPose(a, b, k);
     r[BODY_YAW] = a[BODY_YAW] + wrapPi(b[BODY_YAW] - a[BODY_YAW]) * k;
     return r;
 }
 
-// ═════════════ KEYFRAMES ═════════════
+// keyframes
 
 struct Key   { float beat; Pose pose; };
-struct Track { std::vector<Key> keys; bool suave; }; // suave = ease in/out entre keys
+struct Track { std::vector<Key> keys; bool suave; };
 
-// Crea un keyframe a partir de pares {canal, valor}. Si un canal se repite, se suma.
+// arma un keyframe, si un canal se repite se suma
 inline Key K(float beat, std::initializer_list<std::pair<int, float> > v)
 {
     Key k;
@@ -100,7 +83,7 @@ inline Key K(float beat, std::initializer_list<std::pair<int, float> > v)
     return k;
 }
 
-// Interpola la pose en 'beat' dentro de una tabla de keyframes
+// pose en el beat dado, interpolando entre keyframes
 inline Pose evalTrack(const Track& t, float beat)
 {
     const std::vector<Key>& k = t.keys;
@@ -115,17 +98,14 @@ inline Pose evalTrack(const Track& t, float beat)
     return lerpPose(k[i].pose, k[i + 1].pose, u);
 }
 
-// ───────────── Bloques reutilizables para escribir poses ─────────────
-// Pie izquierdo / derecho levantado (a = intensidad del paso)
+// macros para escribir poses
 #define PL(a) {LEGL_PITCH,-0.80f*(a)},{LEGL_ROLL, 0.10f*(a)},{HIP_ROLL, 0.08f*(a)}
 #define PR(a) {LEGR_PITCH,-0.80f*(a)},{LEGR_ROLL,-0.10f*(a)},{HIP_ROLL,-0.08f*(a)}
 
-// ---- Seccion 0: Paso base ----
 #define S0_BASE   {SHL_ROLL,0.15f},{SHR_ROLL,-0.15f},{ELL_BEND,-0.30f},{ELR_BEND,-0.50f},{TORSO_BEND,0.17f}
 #define S0_ARMS_L {SHL_PITCH, 0.55f},{SHR_PITCH,-0.55f},{TORSO_ROLL, 0.08f}
 #define S0_ARMS_R {SHL_PITCH,-0.55f},{SHR_PITCH, 0.55f},{TORSO_ROLL,-0.08f}
 
-// ---- Seccion 1: Lanzar la red ----
 #define S1_REST   {ELL_BEND,-0.30f}
 #define S1_WIND   {TORSO_BEND,-0.30f},{TORSO_TWIST,0.55f},{HEAD_NOD,-0.15f},                 \
                   {SHR_PITCH,1.10f},{SHR_ROLL,-0.50f},{ELR_BEND,-0.40f},                      \
@@ -135,7 +115,6 @@ inline Pose evalTrack(const Track& t, float beat)
                   {SHL_PITCH,-2.00f},{SHL_ROLL,0.20f},{ELL_BEND,-0.30f},{HIP_DROP,0.04f},     \
                   {LEGL_PITCH,-0.50f}
 
-// ---- Seccion 2: Jalar la red (mano sobre mano) ----
 #define S2_REST   {SHL_PITCH,-0.90f},{ELL_BEND,-0.80f},{SHR_PITCH,-0.90f},{ELR_BEND,-0.80f}, \
                   {TORSO_BEND,0.30f},{HIP_DROP,0.05f},{HEAD_NOD,0.15f},                       \
                   {LEGL_ROLL,0.18f},{LEGR_ROLL,-0.18f}
@@ -146,12 +125,10 @@ inline Pose evalTrack(const Track& t, float beat)
 #define S2_JALA_R {SHL_PITCH,-0.40f},{ELL_BEND,-1.60f},{SHR_PITCH,-1.40f},{ELR_BEND,0.0f},   \
                   {TORSO_TWIST,-0.30f},{BOAT_ROLL,-0.03f}
 
-// ---- Seccion 3: Giro con brazos abiertos ----
 #define S3_ARMS   {SHL_ROLL,2.0f},{SHR_ROLL,-2.0f},{ELL_BEND,-0.2f},{ELR_BEND,-0.2f},        \
                   {TORSO_BEND,-0.10f},{HEAD_NOD,-0.15f}
 #define YAW_4PI   12.566371f
 
-// ---- Seccion 4: Barrido de la red ----
 #define S4_COM    {ELR_BEND,-0.2f},{SHL_PITCH,-0.2f},{ELL_BEND,-0.6f},{TORSO_BEND,0.15f}
 #define S4_CENTRO {SHR_PITCH,-1.8f},{SHR_ROLL,-0.6f},{SHL_ROLL,1.2f}
 #define S4_DER    {SHR_PITCH,-1.4f},{SHR_ROLL, 0.2f},{SHL_ROLL,0.8f},                        \
@@ -159,34 +136,29 @@ inline Pose evalTrack(const Track& t, float beat)
 #define S4_IZQ    {SHR_PITCH,-2.2f},{SHR_ROLL,-1.4f},{SHL_ROLL,1.6f},                        \
                   {TORSO_TWIST,-0.45f},{TORSO_ROLL,-0.10f},{HEAD_TURN,-0.5f}
 
-// ---- Seccion 5: Remar ----
 #define S5_NEUTRO {HIP_DROP,0.05f}
 #define S5_JALA   {TORSO_BEND,-0.30f},{HIP_DROP,0.05f},{SHL_PITCH,-1.2f},{SHR_PITCH,-1.2f},  \
                   {ELL_BEND,-1.5f},{ELR_BEND,-1.5f}
 #define S5_EMPUJA {TORSO_BEND,0.60f},{HIP_DROP,0.15f},{SHL_PITCH,0.8f},{SHR_PITCH,0.8f},     \
                   {ELL_BEND,-0.4f},{ELR_BEND,-0.4f},{HEAD_NOD,0.20f}
 
-// ---- Seccion 6: Ofrenda (zapateado con la red al cielo) ----
 #define S6_BASE   {SHR_PITCH,-2.5f},{SHR_ROLL,-0.3f},{ELR_BEND,-0.1f},                       \
                   {SHL_PITCH,-2.5f},{SHL_ROLL, 0.3f},{ELL_BEND,-0.1f},                        \
                   {TORSO_BEND,-0.3f},{HEAD_NOD,-0.5f}
 #define S6_ZAP_L  PL(1.2f),{HIP_DROP,0.036f},{TORSO_ROLL, 0.05f},{SHL_ROLL, 0.05f},{SHR_ROLL, 0.05f}
 #define S6_ZAP_R  PR(1.2f),{HIP_DROP,0.036f},{TORSO_ROLL,-0.05f},{SHL_ROLL,-0.05f},{SHR_ROLL,-0.05f}
 
-// ---- Seccion 7: Reverencia y celebracion ----
 #define S7_BOW    {TORSO_BEND,0.60f},{HEAD_NOD,0.20f},{HIP_DROP,0.06f},{SHL_PITCH,0.90f},{SHR_PITCH,0.90f}
 #define S7_CELE   {TORSO_BEND,-0.25f},{HEAD_NOD,-0.30f}
 
 
-// ═════════════ TABLAS DE POSES (aqui se edita el baile) ═════════════
+// tablas de poses, aqui se edita el baile
 
 inline std::vector<Track> crearSecciones()
 {
     std::vector<Track> T;
 
-    // ───────── 0. PASO BASE ─────────
-    // Un paso por beat, alternando pie izq/der con balanceo de brazos,
-    // torsion de torso y la cabeza mirando de lado a lado.
+    // 0. paso base
     T.push_back(Track{ {
         K(0.0f, { S0_BASE }),
         K(1.0f, { S0_BASE, PL(1.0f), S0_ARMS_L, {TORSO_TWIST, 0.25f}, {HEAD_TURN, 0.25f} }),
@@ -199,21 +171,18 @@ inline std::vector<Track> crearSecciones()
         K(8.0f, { S0_BASE })
     }, true });
 
-    // ───────── 1. LANZAR LA RED ─────────
-    // Dos lanzamientos: se prepara (brazos atras, torso girado),
-    // lanza de golpe (brazos arriba y adelante) y regresa a reposo.
+    // 1. lanzar la red
     T.push_back(Track{ {
         K(0.0f, { S1_REST }),
-        K(1.8f, { S1_WIND }),      // preparacion 1
-        K(2.4f, { S1_THROW }),     // lanzamiento 1
-        K(4.0f, { S1_REST }),      // reposo
-        K(5.8f, { S1_WIND }),      // preparacion 2
-        K(6.4f, { S1_THROW }),     // lanzamiento 2
+        K(1.8f, { S1_WIND }),
+        K(2.4f, { S1_THROW }),
+        K(4.0f, { S1_REST }),
+        K(5.8f, { S1_WIND }),
+        K(6.4f, { S1_THROW }),
         K(8.0f, { S1_REST })
     }, true });
 
-    // ───────── 2. JALAR LA RED ─────────
-    // Mano sobre mano: un brazo jala mientras el otro suelta, alternando.
+    // 2. jalar la red
     T.push_back(Track{ {
         K(0.0f, { S2_REST }),
         K(0.5f, { S2_COM, S2_JALA_L, PL(0.25f) }),
@@ -227,9 +196,7 @@ inline std::vector<Track> crearSecciones()
         K(8.0f, { S2_REST })
     }, true });
 
-    // ───────── 3. GIRO ─────────
-    // Brazos abiertos y dos vueltas completas (4*PI). Interpolacion lineal
-    // (suave = false) para que el giro tenga velocidad constante.
+    // 3. giro
     T.push_back(Track{ {
         K(0.0f, { }),
         K(0.5f, { {BODY_YAW, 0.0f} }),
@@ -244,9 +211,7 @@ inline std::vector<Track> crearSecciones()
         K(8.0f, { {BODY_YAW, YAW_4PI} })
     }, false });
 
-    // ───────── 4. BARRIDO DE LA RED ─────────
-    // La red en alto se mueve de derecha a izquierda (4 beats por ciclo),
-    // con el torso y la cabeza siguiendo el movimiento.
+    // 4. barrido de la red
     T.push_back(Track{ {
         K(0.0f, { S4_COM, S4_CENTRO }),
         K(1.0f, { S4_COM, S4_DER,    PL(0.5f) }),
@@ -259,9 +224,7 @@ inline std::vector<Track> crearSecciones()
         K(8.0f, { S4_COM, S4_CENTRO })
     }, true });
 
-    // ───────── 5. REMAR ─────────
-    // Cada 2 beats: jala el remo hacia el pecho (torso atras) y
-    // lo empuja hacia adelante (torso inclinado, cadera baja).
+    // 5. remar
     T.push_back(Track{ {
         K(0.0f, { S5_NEUTRO }),
         K(0.5f, { S5_JALA,   PL(0.4f) }),
@@ -275,9 +238,7 @@ inline std::vector<Track> crearSecciones()
         K(8.0f, { S5_NEUTRO })
     }, true });
 
-    // ───────── 6. OFRENDA ─────────
-    // Brazos y red levantados al cielo, mirando arriba, mientras
-    // zapatea rapido alternando los pies en cada beat.
+    // 6. ofrenda
     T.push_back(Track{ {
         K(0.0f, { S6_BASE }),
         K(1.0f, { S6_BASE, S6_ZAP_L }),
@@ -290,27 +251,24 @@ inline std::vector<Track> crearSecciones()
         K(8.0f, { S6_BASE })
     }, true });
 
-    // ───────── 7. REVERENCIA FINAL ─────────
-    // Se inclina con los brazos adelante (reverencia), se endereza y
-    // celebra con los brazos abiertos moviendo la red y saltando.
+    // 7. reverencia y celebracion
     T.push_back(Track{ {
         K(0.0f,  { }),
-        K(1.5f,  { S7_BOW }),                                                                   // reverencia
-        K(4.0f,  { S7_BOW }),                                                                   // sostiene
-        K(5.5f,  { }),                                                                          // se endereza
-        K(6.5f,  { S7_CELE, {SHL_ROLL, 2.60f}, {SHR_ROLL,-2.60f} }),                            // brazos abiertos
-        K(6.75f, { S7_CELE, {SHL_ROLL, 2.75f}, {SHR_ROLL,-2.75f}, {NET_Z, 0.40f}, PL(0.9f) }),  // celebra
+        K(1.5f,  { S7_BOW }),
+        K(4.0f,  { S7_BOW }),
+        K(5.5f,  { }),
+        K(6.5f,  { S7_CELE, {SHL_ROLL, 2.60f}, {SHR_ROLL,-2.60f} }),
+        K(6.75f, { S7_CELE, {SHL_ROLL, 2.75f}, {SHR_ROLL,-2.75f}, {NET_Z, 0.40f}, PL(0.9f) }),
         K(7.0f,  { S7_CELE, {SHL_ROLL, 2.45f}, {SHR_ROLL,-2.45f}, {NET_Z,-0.40f}, PR(0.9f) }),
         K(7.25f, { S7_CELE, {SHL_ROLL, 2.75f}, {SHR_ROLL,-2.75f}, {NET_Z, 0.40f}, PL(0.9f) }),
         K(7.5f,  { S7_CELE, {SHL_ROLL, 2.45f}, {SHR_ROLL,-2.45f}, {NET_Z,-0.40f}, PR(0.9f) }),
-        K(8.0f,  { })                                                                           // reposo
+        K(8.0f,  { })
     }, true });
 
     return T;
 }
 
-// ───────── OLEAJE: tambien por keyframes (se repite cada 8 beats) ─────────
-// La lancha sube/baja y se inclina suavemente (un ciclo = 8 beats).
+// oleaje de la lancha, un ciclo cada 8 beats
 inline Track crearOleajeLancha()
 {
     return Track{ {
@@ -326,7 +284,7 @@ inline Track crearOleajeLancha()
     }, true };
 }
 
-// La red se balancea en circulo (X y Z desfasados un cuarto de ciclo, 2 beats por vuelta).
+// balanceo de la red, da una vuelta cada 2 beats
 inline Track crearOleajeRed()
 {
     return Track{ {
@@ -350,7 +308,7 @@ inline Track crearOleajeRed()
     }, true };
 }
 
-// Las tablas se construyen una sola vez
+// se construyen una sola vez
 inline const std::vector<Track>& secciones() { static const std::vector<Track> T = crearSecciones();   return T; }
 inline const Track& oleajeLancha()           { static const Track T = crearOleajeLancha();            return T; }
 inline const Track& oleajeRed()              { static const Track T = crearOleajeRed();               return T; }
@@ -383,19 +341,19 @@ inline const Track& oleajeRed()              { static const Track T = crearOleaj
 #undef S7_CELE
 
 
-// ═════════════ EVALUADOR ═════════════
+// evaluador
 
-// Pose de una seccion en un beat local (0..8), leida de su tabla de keyframes
+// pose de una seccion en un beat local
 inline Pose evalSection(int s, float b)
 {
     int idx = std::max(0, std::min(NUM_SECTIONS - 1, s));
     return evalTrack(secciones()[idx], b);
 }
 
-// t = tiempo en segundos, delayBeats = retraso de este personaje, phase = desfase del oleaje
+// t = tiempo en segundos, delayBeats = retraso del personaje, phase = desfase del oleaje
 inline Pose evaluate(float t, float delayBeats, float phase)
 {
-    float tb    = t * BPM / 60.0f;                       // tiempo en beats
+    float tb    = t * BPM / 60.0f;
     float b     = std::max(0.0f, tb - delayBeats);
     float total = NUM_SECTIONS * BEATS_PER_SECTION;
     float cb    = std::fmod(b, total);
@@ -404,14 +362,14 @@ inline Pose evaluate(float t, float delayBeats, float phase)
 
     Pose cur = evalSection(s, lb);
 
-    // Transicion suave: al inicio de cada seccion se mezcla con la pose final de la anterior
+    // mezcla con la seccion anterior al inicio de cada una
     if (lb < BLEND_BEATS && (s > 0 || b >= total)) {
         int  ps   = (s + NUM_SECTIONS - 1) % NUM_SECTIONS;
         Pose prev = evalSection(ps, BEATS_PER_SECTION);
         cur = mix(prev, cur, smooth(lb / BLEND_BEATS));
     }
 
-    // Oleaje y balanceo de la red (tambien keyframes; 'phase' los desfasa entre lanchas)
+    // suma del oleaje de la lancha y la red
     float ob = std::fmod(tb + phase * BEATS_PER_SECTION / (2.0f * PI), BEATS_PER_SECTION);
     if (ob < 0.0f) ob += BEATS_PER_SECTION;
 
@@ -422,7 +380,8 @@ inline Pose evaluate(float t, float delayBeats, float phase)
     return cur;
 }
 
-// ───────────── Matrices finales ─────────────
+// matrices finales
+
 struct Mats {
     glm::mat4 lancha, cadera, torso, cabeza;
     glm::mat4 hombroIzq, codoIzq, hombroDer, codoDer;
@@ -459,7 +418,7 @@ Mats build(const P& r, const Pose& a, const Pose& lag)
     glm::mat4 Ahead = Atorso *
         rotAbout(neck, Ry(a[HEAD_TURN]) * Rz(a[HEAD_TILT]) * Rx(FWD * a[HEAD_NOD]));
 
-    // ── RESTRICCION DINAMICA DE COLISION ──
+    // evita que la red atraviese la lancha
     Pose a_adj = a;
     const float MAX_SAFE_PITCH = 0.15f;
     if (a_adj[SHR_PITCH] > MAX_SAFE_PITCH) {

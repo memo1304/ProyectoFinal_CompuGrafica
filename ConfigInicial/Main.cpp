@@ -1,8 +1,8 @@
 //Proyecto Final
 //Equipo 9
-//319205459 319276017
+//319205459, 319276017
 //Grupo 7
-//Fecha de entrega 11 de noviembre
+//Fecha de entrega 11 de noviembre de 2026
 
 #include <iostream>
 #include <cmath>
@@ -53,9 +53,6 @@ void playSound(const std::string& filename) {
 #endif
 }
 
-// ── Limpieza de audio al salir ──
-// Mata los procesos afplay asociados al proyecto para que no sigan sonando
-// cuando se cierra la ventana o se presiona Ctrl+C.
 void cleanupAudio() {
 #ifdef __APPLE__
     std::system("pkill -f 'afplay.*campana' 2>/dev/null");
@@ -64,7 +61,7 @@ void cleanupAudio() {
 }
 
 extern "C" void handleSigint(int) {
-    exit(0);   // dispara atexit -> cleanupAudio()
+    exit(0);   
 }
 
 // ───────────── Configuración ─────────────
@@ -79,6 +76,9 @@ bool    firstMouse = true;
 
 GLfloat deltaTime = 0.0f;
 GLfloat lastFrame = 0.0f;
+
+// ── Velas que se envian al shader cada frame ──
+const int NUM_FLAME_LIGHTS_CPU = 32;
 
 // ═══════════════════════════════════════════════════════════
 // SISTEMA DE CÁMARAS Y SUELO
@@ -104,6 +104,9 @@ const float PERSONAJE_RADIO     = 0.08f;
 const float LUZ_ESCENARIO = 0.45f;
 const float BRILLO_CIELO  = 0.55f;
 const float LUZ_PISO      = 1.00f;
+
+// ── Luna (posicion unica para el modelo y el spotlight) ──
+const glm::vec3 LUNA_POSICION(-10.0f, 18.0f, -20.0f);
 
 Personaje::Estado personaje;
 
@@ -594,7 +597,6 @@ std::string wrapText(const std::string& text, float maxWidth)
 // ═══════════════════════════════════════════════════════════
 int main()
 {
-    // ── Limpieza de audio al salir (return normal o Ctrl+C) ──
     atexit(cleanupAudio);
     signal(SIGINT, handleSigint);
 
@@ -607,7 +609,7 @@ int main()
 #endif
     glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
 
-    GLFWwindow* window = glfwCreateWindow(WIDTH, HEIGHT, "Proyecto final equipo 9", nullptr, nullptr);
+    GLFWwindow* window = glfwCreateWindow(WIDTH, HEIGHT, "Proyecto final equipo 9 - 319205459, 319276017", nullptr, nullptr);
     if (!window) { std::cout << "Failed GLFW window\n"; glfwTerminate(); return -1; }
 
     glfwMakeContextCurrent(window);
@@ -678,10 +680,9 @@ int main()
         for (GLint i = 0; i < nUniforms; ++i) {
             char name[128]; GLsizei len = 0; GLint size = 0; GLenum type = 0;
             glGetActiveUniform(lightingShader.Program, i, sizeof(name), &len, &size, &type, name);
-            if (std::string(name).rfind("flamePos", 0) == 0 && size < totalFlamas) {
+            if (std::string(name).rfind("flamePos", 0) == 0 && size < NUM_FLAME_LIGHTS_CPU) {
                 std::cout << "AVISO: lighting.frag solo tiene espacio para " << size
-                          << " flamas y hay " << totalFlamas
-                          << ". Aumenta el tamano del arreglo flamePos (y el limite del for)." << std::endl;
+                          << " flamas pero se envian " << NUM_FLAME_LIGHTS_CPU << std::endl;
             }
         }
     }
@@ -706,10 +707,23 @@ int main()
 
     std::vector<Mariposas::Mariposa> mariposas = Mariposas::crear();
 
-    const int NUM_FLAME_LIGHTS_CPU = 32;
     std::vector<std::pair<float, int>> flameDists;
     flameDists.reserve(totalFlamas);
     glm::vec3 nearestFlames[NUM_FLAME_LIGHTS_CPU];
+
+    // ── Textura de relleno para la unidad 1 (especular) ──
+    // Si un modelo no tiene textura especular, se usa este pixel negro
+    // para que el shader lea negro en lugar de "nada".
+    GLuint fallbackSpecular;
+    {
+        glGenTextures(1, &fallbackSpecular);
+        glBindTexture(GL_TEXTURE_2D, fallbackSpecular);
+        unsigned char blackPixel[4] = {0, 0, 0, 255};
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 1, 1, 0, GL_RGBA, GL_UNSIGNED_BYTE, blackPixel);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        glBindTexture(GL_TEXTURE_2D, 0);
+    }
 
     camera.SetYaw(0.0f);
 
@@ -742,29 +756,35 @@ int main()
         glClearColor(0.02f, 0.03f, 0.08f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+        // Asegurar que la unidad 1 siempre tenga algo valido
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_2D, fallbackSpecular);
+        glActiveTexture(GL_TEXTURE0);
+
         lightingShader.Use();
         GLuint prog = lightingShader.Program;
 
         setVec3(prog, "viewPos", renderCamPos.x, renderCamPos.y, renderCamPos.z);
 
+        // ── Luz direccional (luz de luna sobre el escenario) ──
         setVec3 (prog, "dirLight.direction", -0.2f, -1.0f, -0.3f);
         setVec3 (prog, "dirLight.ambient",    0.10f * LUZ_ESCENARIO, 0.15f * LUZ_ESCENARIO, 0.25f * LUZ_ESCENARIO);
         setVec3 (prog, "dirLight.diffuse",    0.30f * LUZ_ESCENARIO, 0.35f * LUZ_ESCENARIO, 0.55f * LUZ_ESCENARIO);
         setVec3 (prog, "dirLight.specular",   0.20f * LUZ_ESCENARIO, 0.25f * LUZ_ESCENARIO, 0.35f * LUZ_ESCENARIO);
 
-        glm::vec3 lunaPos   (-10.0f, 5.0f, -12.0f);
-        glm::vec3 lunaTarget(  2.0f, 0.0f,   0.0f);
-        glm::vec3 lunaDir = glm::normalize(lunaTarget - lunaPos);
-        setVec3 (prog, "spotLight.position",    lunaPos.x, lunaPos.y, lunaPos.z);
+        // ── SpotLight de la luna ──
+        glm::vec3 lunaTarget( 2.0f, 0.0f, 0.0f);
+        glm::vec3 lunaDir = glm::normalize(lunaTarget - LUNA_POSICION);
+        setVec3 (prog, "spotLight.position",    LUNA_POSICION.x, LUNA_POSICION.y, LUNA_POSICION.z);
         setVec3 (prog, "spotLight.direction",   lunaDir.x, lunaDir.y, lunaDir.z);
         setFloat(prog, "spotLight.cutOff",      glm::cos(glm::radians(30.0f)));
         setFloat(prog, "spotLight.outerCutOff", glm::cos(glm::radians(45.0f)));
         setFloat(prog, "spotLight.constant",    1.0f);
         setFloat(prog, "spotLight.linear",      0.005f);
         setFloat(prog, "spotLight.quadratic",   0.0005f);
-        setVec3 (prog, "spotLight.ambient",     0.08f * LUZ_ESCENARIO, 0.10f * LUZ_ESCENARIO, 0.18f * LUZ_ESCENARIO);
-        setVec3 (prog, "spotLight.diffuse",     0.80f * LUZ_ESCENARIO, 0.90f * LUZ_ESCENARIO, 1.10f * LUZ_ESCENARIO);
-        setVec3 (prog, "spotLight.specular",    0.30f * LUZ_ESCENARIO, 0.40f * LUZ_ESCENARIO, 0.60f * LUZ_ESCENARIO);
+        setVec3 (prog, "spotLight.ambient",     0.08f, 0.10f, 0.18f);
+        setVec3 (prog, "spotLight.diffuse",     0.80f, 0.90f, 1.10f);
+        setVec3 (prog, "spotLight.specular",    0.30f, 0.40f, 0.60f);
 
         flameDists.clear();
         for (int i = 0; i < totalFlamas; ++i) {
@@ -834,11 +854,11 @@ int main()
             flama.Draw(lightingShader);
         }
 
-        // LUNA
-        setEmission(prog, 0.0f, 0.0f, 0.0f);
+        // LUNA (con brillo propio)
+        setEmission(prog, 0.85f, 0.90f, 1.05f);
         glUniform1i(transLoc, 0);
         model = glm::mat4(1.0f);
-        model = glm::translate(model, glm::vec3(-10.0f, 18.0f, -20.0f));
+        model = glm::translate(model, LUNA_POSICION);
         model = glm::scale    (model, glm::vec3(0.6f));
         glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
         luna.Draw(lightingShader);
@@ -1006,7 +1026,6 @@ int main()
 
     glfwTerminate();
 
-    // Detener cualquier afplay que se haya quedado vivo
     cleanupAudio();
 
     return 0;
